@@ -95,7 +95,7 @@ app.post("/api/login", async (req, res) => {
   });
 });
 
-app.post("/students", verifyToken, isAdmin, async (req, res) => {
+app.post("/api/students", verifyToken, isAdmin, async (req, res) => {
   try {
     const { studentCode, password, rollNo, name } = req.body;
 
@@ -112,7 +112,7 @@ app.post("/students", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/students", verifyToken, isAdmin, async (req, res) => {
+app.get("/api/students", verifyToken, isAdmin, async (req, res) => {
   try {
     const students = await Student.find().sort({ rollNo: 1 });
 
@@ -122,7 +122,7 @@ app.get("/students", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/students/search/:key", verifyToken, isAdmin, async (req, res) => {
+app.get("/api/students/search/:key", verifyToken, isAdmin, async (req, res) => {
   try {
     const key = req.params.key;
 
@@ -140,7 +140,7 @@ app.get("/students/search/:key", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.put("/students/:id", verifyToken, isAdmin, async (req, res) => {
+app.put("/api/students/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const { studentCode, rollNo, name } = req.body;
 
@@ -160,7 +160,7 @@ app.put("/students/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.delete("/students/:id", verifyToken, isAdmin, async (req, res) => {
+app.delete("/api/students/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     await Student.findByIdAndDelete(req.params.id);
 
@@ -172,7 +172,7 @@ app.delete("/students/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.put("/students/reset/:id", verifyToken, isAdmin, async (req, res) => {
+app.put("/api/students/reset/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const { password } = req.body;
 
@@ -190,7 +190,7 @@ app.put("/students/reset/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.post("/tests", verifyToken, isAdmin, async (req, res) => {
+app.post("/api/tests", verifyToken, isAdmin, async (req, res) => {
   try {
     const test = await Test.create(req.body);
     res.status(201).json(test);
@@ -199,7 +199,7 @@ app.post("/tests", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/tests", verifyToken, async (req, res) => {
+app.get("/api/tests", verifyToken, async (req, res) => {
   try {
     const tests = await Test.find().sort({ date: -1 });
     res.json(tests);
@@ -208,7 +208,7 @@ app.get("/tests", verifyToken, async (req, res) => {
   }
 });
 
-app.put("/tests/:id", verifyToken, isAdmin, async (req, res) => {
+app.put("/api/tests/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const test = await Test.findByIdAndUpdate(
       req.params.id,
@@ -222,7 +222,7 @@ app.put("/tests/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.delete("/tests/:id", verifyToken, isAdmin, async (req, res) => {
+app.delete("/api/tests/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     await Test.findByIdAndDelete(req.params.id);
 
@@ -237,7 +237,7 @@ app.delete("/tests/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/results/:testId", verifyToken, isAdmin, async (req, res) => {
+app.get("/api/results/:testId", verifyToken, isAdmin, async (req, res) => {
   try {
     const students = await Student.find().sort({ rollNo: 1 });
 
@@ -264,7 +264,7 @@ app.get("/results/:testId", verifyToken, isAdmin, async (req, res) => {
 });
 
 
-app.post("/results/:testId", verifyToken, isAdmin, async (req, res) => {
+app.post("/api/results/:testId", verifyToken, isAdmin, async (req, res) => {
   try {
     const { testId } = req.params;
     const results = req.body;
@@ -294,7 +294,7 @@ app.post("/results/:testId", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/dashboard", verifyToken, isAdmin, async (req, res) => {
+app.get("/api/dashboard", verifyToken, isAdmin, async (req, res) => {
   try {
     const totalStudents = await Student.countDocuments();
     const totalTests = await Test.countDocuments();
