@@ -25,11 +25,11 @@ mongoose
   .catch((err) => console.log(err));
 
 // Test Route
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
   res.send("🚀 Test Management API is Running...");
 });
 
-app.post("/api/login", async (req, res) => {
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   // Check Admin
@@ -86,7 +86,7 @@ app.post("/api/login", async (req, res) => {
   });
 });
 
-app.post("/api/students", verifyToken, isAdmin, async (req, res) => {
+app.post("/students", verifyToken, isAdmin, async (req, res) => {
   try {
     const { studentCode, password, rollNo, name } = req.body;
 
@@ -103,7 +103,7 @@ app.post("/api/students", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/students", verifyToken, isAdmin, async (req, res) => {
+app.get("/students", verifyToken, isAdmin, async (req, res) => {
   try {
     const students = await Student.find().sort({ rollNo: 1 });
 
@@ -113,7 +113,7 @@ app.get("/api/students", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/students/search/:key", verifyToken, isAdmin, async (req, res) => {
+app.get("/students/search/:key", verifyToken, isAdmin, async (req, res) => {
   try {
     const key = req.params.key;
 
@@ -131,7 +131,7 @@ app.get("/api/students/search/:key", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.put("/api/students/:id", verifyToken, isAdmin, async (req, res) => {
+app.put("/students/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const { studentCode, rollNo, name } = req.body;
 
@@ -151,7 +151,7 @@ app.put("/api/students/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.delete("/api/students/:id", verifyToken, isAdmin, async (req, res) => {
+app.delete("/students/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     await Student.findByIdAndDelete(req.params.id);
 
@@ -163,7 +163,7 @@ app.delete("/api/students/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.put("/api/students/reset/:id", verifyToken, isAdmin, async (req, res) => {
+app.put("/students/reset/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const { password } = req.body;
 
@@ -181,7 +181,7 @@ app.put("/api/students/reset/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.post("/api/tests", verifyToken, isAdmin, async (req, res) => {
+app.post("/tests", verifyToken, isAdmin, async (req, res) => {
   try {
     const test = await Test.create(req.body);
     res.status(201).json(test);
@@ -190,7 +190,7 @@ app.post("/api/tests", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/tests", verifyToken, async (req, res) => {
+app.get("/tests", verifyToken, async (req, res) => {
   try {
     const tests = await Test.find().sort({ date: -1 });
     res.json(tests);
@@ -199,7 +199,7 @@ app.get("/api/tests", verifyToken, async (req, res) => {
   }
 });
 
-app.put("/api/tests/:id", verifyToken, isAdmin, async (req, res) => {
+app.put("/tests/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const test = await Test.findByIdAndUpdate(
       req.params.id,
@@ -213,7 +213,7 @@ app.put("/api/tests/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.delete("/api/tests/:id", verifyToken, isAdmin, async (req, res) => {
+app.delete("/tests/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     await Test.findByIdAndDelete(req.params.id);
 
@@ -228,7 +228,7 @@ app.delete("/api/tests/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/results/:testId", verifyToken, isAdmin, async (req, res) => {
+app.get("/results/:testId", verifyToken, isAdmin, async (req, res) => {
   try {
     const students = await Student.find().sort({ rollNo: 1 });
 
@@ -255,7 +255,7 @@ app.get("/api/results/:testId", verifyToken, isAdmin, async (req, res) => {
 });
 
 
-app.post("/api/results/:testId", verifyToken, isAdmin, async (req, res) => {
+app.post("/results/:testId", verifyToken, isAdmin, async (req, res) => {
   try {
     const { testId } = req.params;
     const results = req.body;
@@ -285,7 +285,7 @@ app.post("/api/results/:testId", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/dashboard", verifyToken, isAdmin, async (req, res) => {
+app.get("/dashboard", verifyToken, isAdmin, async (req, res) => {
   try {
     const totalStudents = await Student.countDocuments();
     const totalTests = await Test.countDocuments();
@@ -356,13 +356,7 @@ async function createAdmin() {
   }
 }
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-  });
-}
-
-app.get("/api/student/dashboard", verifyToken, isStudent, async (req, res) => {
+app.get("/student/dashboard", verifyToken, isStudent, async (req, res) => {
   try {
     const student = await Student.findById(req.user.id);
 
@@ -400,7 +394,7 @@ app.get("/api/student/dashboard", verifyToken, isStudent, async (req, res) => {
   }
 });
 
-app.get("/api/student/results", verifyToken, isStudent, async (req, res) => {
+app.get("/student/results", verifyToken, isStudent, async (req, res) => {
   try {
     const results = await Result.find({
       studentId: req.user.id,
@@ -413,4 +407,12 @@ app.get("/api/student/results", verifyToken, isStudent, async (req, res) => {
     });
   }
 });
+
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+  });
+}
+
 module.exports = app;
