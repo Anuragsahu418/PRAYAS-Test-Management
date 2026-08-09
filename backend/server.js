@@ -416,3 +416,12 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 module.exports = app;
+
+app.get("/api/create-admins", async (req, res) => {
+  try {
+    await createAdmin();
+    res.send("Admins created successfully");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
