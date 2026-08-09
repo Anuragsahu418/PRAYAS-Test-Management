@@ -29,6 +29,15 @@ app.get("/api", (req, res) => {
   res.send("🚀 Test Management API is Running...");
 });
 
+app.get("/api/create-admins", async (req, res) => {
+  try {
+    await createAdmin();
+    res.send("Admins created successfully");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -416,12 +425,3 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 module.exports = app;
-
-app.get("/api/create-admins", async (req, res) => {
-  try {
-    await createAdmin();
-    res.send("Admins created successfully");
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
