@@ -65,7 +65,7 @@ return (
         </h1>
 
         <p className="mt-3 text-center text-sm sm:text-base text-slate-300">
-          Access the cyberpunk student portal
+          WELCOME TO PRAYAS STUDENT PORTAL CLASS 10th
         </p>
 
         {/* Username */}
