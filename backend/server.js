@@ -38,7 +38,7 @@ app.get("/api/create-admins", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
 
   // Check Admin
@@ -365,7 +365,7 @@ async function createAdmin() {
   }
 }
 
-app.get("/student/dashboard", verifyToken, isStudent, async (req, res) => {
+app.get("/api/student/dashboard", verifyToken, isStudent, async (req, res) => {
   try {
     const student = await Student.findById(req.user.id);
 
@@ -403,7 +403,7 @@ app.get("/student/dashboard", verifyToken, isStudent, async (req, res) => {
   }
 });
 
-app.get("/student/results", verifyToken, isStudent, async (req, res) => {
+app.get("/api/student/results", verifyToken, isStudent, async (req, res) => {
   try {
     const results = await Result.find({
       studentId: req.user.id,
