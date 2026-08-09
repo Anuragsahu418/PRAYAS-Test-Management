@@ -25,7 +25,7 @@ mongoose
   .catch((err) => console.log(err));
 
 // Test Route
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.send("🚀 Test Management API is Running...");
 });
 
