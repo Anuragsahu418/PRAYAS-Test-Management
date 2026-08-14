@@ -2197,19 +2197,24 @@ function TestsPage({ search = "" }) {
   }, []);
 
   const loadTests = async () => {
-    try {
-      const res = await api.get("/tests", {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
+  try {
+    const res = await api.get("/tests", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
 
-      setTests(res.data);
+    // Sort by latest date first
+    const sortedTests = [...res.data].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
 
-    } catch (err) {
-      alert("Failed to load tests");
-    }
-  };
+    setTests(sortedTests);
+
+  } catch (err) {
+    alert("Failed to load tests");
+  }
+};
 
   const addTest = async () => {
     try {
@@ -2432,26 +2437,24 @@ function ResultsPage({ search }) {
   }, []);
 
   const loadTests = async () => {
-    try {
-      const res = await api.get("/tests", {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
-
-      setTests(res.data);
-    } catch (err) {
-      alert("Failed to load tests");
-    }
-  };
-
-  const loadStudents = async (testId) => {
   try {
-    const res = await api.get(`/results/${testId}`, {
+    const res = await api.get("/tests", {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
+
+    // Sort by latest date first
+    const sortedTests = [...res.data].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+
+    setTests(sortedTests);
+
+  } catch (err) {
+    alert("Failed to load tests");
+  }
+};
 
     setStudents(res.data);
 
