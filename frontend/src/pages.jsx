@@ -629,7 +629,7 @@ const menus = role === "teacher"
 
       {/* Main */}
 
-       <div className="flex-1 flex flex-col pb-16 lg:pb-0 min-h-screen overflow-y-auto">
+       <div className="flex-1 flex flex-col min-h-screen overflow-y-auto touch-pan-y">
 
 
         {/* Navbar */}
@@ -681,8 +681,7 @@ const menus = role === "teacher"
 {role !== "teacher" && page === "tests" && <TestsPage search={search} />}
 {page === "results" && <ResultsPage search={search} />}
 
-        </main>
-
+    </main>
     </div>
     </div>
   );
@@ -1291,10 +1290,12 @@ const highestMarks =
           </h2>
 
         </div>
-        <div className="rounded-3xl border border-white/10 bg-slate-900/70 backdrop-blur-xl shadow-2xl">
-  <div className="overflow-x-auto overflow-y-hidden touch-pan-x rounded-3xl">
+        <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-    <table className="min-w-[720px] w-full table-fixed border-collapse">
+  <div className="w-full overflow-x-auto touch-pan-x">
+
+    <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
+      
 
           <thead>
 
@@ -1429,9 +1430,10 @@ const highest = totalTests > 0
 
       <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-  <div className="w-full overflow-x-auto overflow-y-hidden touch-pan-x">
+  <div className="w-full overflow-x-auto touch-pan-x">
 
-    <table className="min-w-[760px] w-full border-collapse text-xs sm:text-sm text-slate-200">
+    <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
+      
 
         <thead className="sticky top-0 z-10 bg-[#111827]/95 backdrop-blur-xl border-b border-cyan-400/20 shadow-[0_4px_20px_rgba(34,211,238,0.08)]">
   <tr>
@@ -1732,8 +1734,12 @@ const absentTests = results.length - presentTests;
 
   </div>
 
-  <div className="w-full overflow-x-auto">
-    <table className="min-w-[640px] w-full text-xs sm:text-sm">
+  <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
+
+  <div className="w-full overflow-x-auto touch-pan-x">
+
+    <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
+      
       <thead>
 
             <tr className="border-b border-white/10">
@@ -1849,6 +1855,7 @@ if (percentage >= 90) {
 
                 </tbody>
     </table>
+  </div>
   </div>
 </div>
 
@@ -2060,10 +2067,12 @@ const filteredStudents = students.filter((student) =>
     </div>
   </div>
 )}
-      <div className="rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl">
-  <div className="overflow-x-auto overflow-y-hidden touch-pan-x rounded-3xl">
+      <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-    <table className="min-w-[760px] w-full table-fixed border-collapse">
+  <div className="w-full overflow-x-auto touch-pan-x">
+
+    <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
+      
 
     <thead className="bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-500">
   <tr>
@@ -2324,12 +2333,12 @@ function TestsPage({ search = "" }) {
         </div>
       )}
 
-      <div className="rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl">
-  <div className="overflow-x-auto overflow-y-hidden touch-pan-x rounded-3xl">
+      <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-    <table className="min-w-[720px] w-full table-fixed border-collapse">
-    <div className="w-full overflow-x-auto">
-  <table className="min-w-[700px] w-full text-xs sm:text-sm">
+  <div className="w-full overflow-x-auto touch-pan-x">
+
+    <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
+      
 
     <thead className="bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-500">
 
@@ -2406,11 +2415,7 @@ function TestsPage({ search = "" }) {
 
     </tbody>
       </table>
-</div>
-
-  </table>
-
-</div>
+      </div>
       </div>
     </>
   );
@@ -2536,10 +2541,12 @@ const filteredStudents = students.filter((student) =>
       </div>
     </div>
 
-    <div className="rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl">
-      <div className="overflow-x-auto overflow-y-hidden touch-pan-x rounded-3xl">
+    <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-        <table className="min-w-[820px] w-full table-fixed border-collapse">
+  <div className="w-full overflow-x-auto touch-pan-x">
+
+    <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
+      
 
           <thead className="sticky top-0 z-10 bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 text-white shadow-[0_8px_30px_rgba(34,211,238,0.18)]">
   <tr>
