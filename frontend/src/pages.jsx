@@ -2068,9 +2068,7 @@ const filteredStudents = students.filter((student) =>
   </div>
 )}
       <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
-
   <div className="w-full overflow-x-auto touch-pan-x">
-
     <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
       
 
@@ -2107,11 +2105,12 @@ const filteredStudents = students.filter((student) =>
         <tr
   key={student._id}
   className={`
-    border-b border-white/5
-    transition-colors duration-200
-    hover:bg-white/5
-    ${index % 2 === 0 ? "bg-slate-900/30" : "bg-slate-600/20"}
-  `}
+  border-b border-white/5
+  transition-colors duration-200
+  hover:bg-cyan-500/5
+  hover:border-cyan-400/20
+  ${index % 2 === 0 ? "bg-slate-900/40" : "bg-slate-800/25"}
+`}
 >
 
   <td className="px-3 py-3 text-center font-semibold text-cyan-300 align-middle">
@@ -2542,9 +2541,7 @@ const filteredStudents = students.filter((student) =>
     </div>
 
     <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
-
   <div className="w-full overflow-x-auto touch-pan-x">
-
     <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
       
 
@@ -2573,11 +2570,12 @@ const filteredStudents = students.filter((student) =>
               <tr
                 key={student.studentId}
                 className={`
-                  border-b border-white/5
-                  transition-colors duration-200
-                  hover:bg-white/5
-                  ${index % 2 === 0 ? "bg-slate-900/30" : "bg-slate-800/20"}
-                `}
+  border-b border-white/5
+  transition-colors duration-200
+  hover:bg-cyan-500/5
+  hover:border-cyan-400/20
+  ${index % 2 === 0 ? "bg-slate-900/40" : "bg-slate-800/25"}
+`}
               >
 
                 <td className="px-3 py-3 text-center font-semibold text-cyan-300 align-middle">
