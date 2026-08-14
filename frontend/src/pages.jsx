@@ -1292,7 +1292,7 @@ const highestMarks =
         </div>
         <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-  <div className="w-full overflow-x-auto touch-pan-x">
+  <div className="w-full overflow-x-auto touch-auto">
 
     <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
       
@@ -1430,7 +1430,7 @@ const highest = totalTests > 0
 
       <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-  <div className="w-full overflow-x-auto touch-pan-x">
+  <div className="w-full overflow-x-auto touch-auto">
 
     <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
       
@@ -1736,7 +1736,7 @@ const absentTests = results.length - presentTests;
 
   <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-  <div className="w-full overflow-x-auto touch-pan-x">
+  <div className="w-full overflow-x-auto touch-auto">
 
     <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
       
@@ -2068,7 +2068,7 @@ const filteredStudents = students.filter((student) =>
   </div>
 )}
       <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
-  <div className="w-full overflow-x-auto touch-pan-x">
+  <div className="w-full overflow-x-auto touch-auto">
     <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
       
 
@@ -2334,7 +2334,7 @@ function TestsPage({ search = "" }) {
 
       <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-  <div className="w-full overflow-x-auto touch-pan-x">
+  <div className="w-full overflow-x-auto touch-auto">
 
     <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
       
@@ -2541,7 +2541,7 @@ const filteredStudents = students.filter((student) =>
     </div>
 
     <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
-  <div className="w-full overflow-x-auto touch-pan-x">
+  <div className="w-full overflow-x-auto touch-auto">
     <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
       
 
