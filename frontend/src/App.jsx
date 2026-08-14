@@ -10,7 +10,8 @@ function AdminRoute({ children }) {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
-  if (!token || role !== "admin") {
+  // Allow both admin and teacher
+  if (!token || (role !== "admin" && role !== "teacher")) {
     return <Navigate to="/" replace />;
   }
 
@@ -31,19 +32,14 @@ function StudentRoute({ children }) {
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col bg-slate-950 text-white overflow-x-hidden">
-
+      <div className="min-h-screen flex flex-col bg-[#02030a] text-white">
         {/* Main Content */}
         <main className="flex-1 w-full">
           <Routes>
-
             {/* Login */}
-            <Route
-              path="/"
-              element={<Login />}
-            />
+            <Route path="/" element={<Login />} />
 
-            {/* Admin Dashboard */}
+            {/* Admin + Teacher Dashboard */}
             <Route
               path="/admin"
               element={
@@ -62,7 +58,6 @@ function App() {
                 </StudentRoute>
               }
             />
-
           </Routes>
         </main>
 
@@ -72,7 +67,6 @@ function App() {
             © 2026 Anurag Sahu · PRAYAS · ALL RIGHTS RESERVED
           </p>
         </footer>
-
       </div>
     </BrowserRouter>
   );

@@ -3,13 +3,21 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const { Admin, Student, Test, Result } = require("./models");
-const { verifyToken, isAdmin, isStudent } = require("./middleware");
+const { verifyToken, isAdmin, isStudent, isTeacher } = require("./middleware");
 
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
+
+const isAdminOrTeacher = (req, res, next) => {
+  if (req.user.role === "admin" || req.user.role === "teacher") {
+    return next();
+  }
+
+  return res.status(403).json({ message: "Access denied" });
+};
 
 // Middleware
 app.use(cors());
@@ -50,14 +58,16 @@ app.post("/api/login", async (req, res) => {
     if (!match)
       return res.status(401).json({ message: "Invalid Password" });
 
+    const role = user.username === "Teacher" ? "teacher" : "admin";
+
     const token = jwt.sign(
-      { id: user._id, role: "admin" },
+      { id: user._id, role },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
     return res.json({
-      role: "admin",
+      role,
       token,
     });
   }
@@ -112,7 +122,7 @@ app.post("/api/students", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/students", verifyToken, isAdmin, async (req, res) => {
+app.get("/api/students", verifyToken, isAdminOrTeacher, async (req, res) => {
   try {
     const students = await Student.find().sort({ rollNo: 1 });
 
@@ -122,7 +132,7 @@ app.get("/api/students", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/students/search/:key", verifyToken, isAdmin, async (req, res) => {
+app.get("/api/students/search/:key", verifyToken, isAdminOrTeacher, async (req, res) => {
   try {
     const key = req.params.key;
 
@@ -237,7 +247,7 @@ app.delete("/api/tests/:id", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/results/:testId", verifyToken, isAdmin, async (req, res) => {
+app.get("/api/results/:testId", verifyToken, isAdminOrTeacher, async (req, res) => {
   try {
     const students = await Student.find().sort({ rollNo: 1 });
 
@@ -294,7 +304,7 @@ app.post("/api/results/:testId", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/dashboard", verifyToken, isAdmin, async (req, res) => {
+app.get("/api/dashboard", verifyToken, isAdminOrTeacher, async (req, res) => {
   try {
     const totalStudents = await Student.countDocuments();
     const totalTests = await Test.countDocuments();
@@ -400,6 +410,50 @@ app.get("/api/student/dashboard", verifyToken, isStudent, async (req, res) => {
     res.status(500).json({
       message: err.message,
     });
+  }
+});
+
+app.get("/api/students-with-performance", verifyToken, isAdminOrTeacher, async (req, res) => {
+  try {
+    const students = await Student.find().sort({ rollNo: 1 });
+
+    const data = await Promise.all(
+      students.map(async (student) => {
+        const results = await Result.find({
+          studentId: student._id,
+        }).populate("testId");
+
+        const percentages = results
+          .filter(
+            (r) =>
+              !isNaN(Number(r.marks)) &&
+              r.testId?.totalMarks
+          )
+          .map(
+            (r) =>
+              (Number(r.marks) / Number(r.testId.totalMarks)) * 100
+          );
+
+        const averagePercentage = percentages.length
+          ? (
+              percentages.reduce((a, b) => a + b, 0) /
+              percentages.length
+            ).toFixed(1)
+          : "0.0";
+
+        return {
+          _id: student._id,
+          rollNo: student.rollNo,
+          name: student.name,
+          studentCode: student.studentCode,
+          averagePercentage,
+        };
+      })
+    );
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

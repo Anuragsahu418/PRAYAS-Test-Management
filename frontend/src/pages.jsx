@@ -1,15 +1,146 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "./api";
-import { User, Lock, Users, FileText, TrendingUp, Trophy, BarChart4, LayoutDashboard, ClipboardList, LogOut,GraduationCap} from "lucide-react";
+import { User, Lock, Eye, EyeOff, Users, FileText, TrendingUp, Trophy, BarChart4, LayoutDashboard, ClipboardList, LogOut,GraduationCap} from "lucide-react";
 
 // ================= LOGIN =================
+
+// export function Login() {
+//   const navigate = useNavigate();
+
+//   const [username, setUsername] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [showPassword, setShowPassword] = useState(false);
+
+//   const login = async () => {
+//     try {
+//       const res = await api.post("/login", {
+//         username,
+//         password,
+//       });
+
+//       localStorage.setItem("token", res.data.token);
+//       localStorage.setItem("role", res.data.role);
+//       if (res.data.role === "student") {
+//   localStorage.setItem("studentName", res.data.student.name);
+//   localStorage.setItem("rollNo", res.data.student.rollNo);
+//   localStorage.setItem("studentCode", res.data.student.studentCode);
+// }
+
+//       if (res.data.role === "admin" || res.data.role === "teacher") {
+//   navigate("/admin");
+// } else {
+//   navigate("/student");
+// }
+//     } catch (err) {
+//   console.log(err.response?.data);
+//   console.log(err);
+//   alert(err.response?.data?.message || "Login Failed");
+// }
+//   };
+// return (
+//   <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0b1020] px-4 py-8">
+
+//     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.28),transparent_32%),radial-gradient(circle_at_top_right,rgba(217,70,239,0.26),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,85,247,0.22),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.22),transparent_32%),linear-gradient(135deg,#0f172a_0%,#111827_35%,#1e1b4b_70%,#0f172a_100%)]" />
+
+//     {/* Animated Neon Grid */}
+//     <div className="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(217,70,239,0.08)_1px,transparent_1px)] bg-[size:36px_36px] opacity-70" />
+
+//     {/* Moving Glow Orbs */}
+//     <div className="absolute -top-24 -left-20 h-[26rem] w-[26rem] rounded-full bg-cyan-400/40 blur-[140px] animate-pulse" />
+//     <div className="absolute top-8 right-[-4rem] h-[24rem] w-[24rem] rounded-full bg-fuchsia-500/40 blur-[150px] animate-pulse" />
+//     <div className="absolute bottom-[-6rem] left-1/4 h-[22rem] w-[22rem] rounded-full bg-violet-500/35 blur-[140px] animate-pulse" />
+//     <div className="absolute bottom-10 right-1/4 h-[18rem] w-[18rem] rounded-full bg-blue-400/30 blur-[120px] animate-pulse" />
+
+//     {/* Center Ambient Glow */}
+//     <div className="absolute inset-x-0 top-1/2 mx-auto h-56 w-[80%] rounded-full bg-gradient-to-r from-cyan-400/15 via-fuchsia-400/15 to-violet-400/15 blur-[120px]" />
+
+//     <div className="relative z-10 w-full max-w-sm sm:max-w-md">
+//       <div className="relative overflow-hidden rounded-[2rem] border border-cyan-400/30 bg-slate-900/45 p-6 sm:p-8 shadow-[0_0_30px_rgba(34,211,238,0.28),0_0_90px_rgba(168,85,247,0.22),0_0_120px_rgba(217,70,239,0.16),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(34,211,238,0.10),transparent_30%,rgba(217,70,239,0.10))] before:pointer-events-none after:absolute after:-inset-px after:rounded-[2rem] after:border after:border-white/8 after:pointer-events-none">
+//         <div className="mb-6 flex justify-center">
+//           <div className="rounded-full border border-cyan-400/40 bg-cyan-500/15 p-4 shadow-[0_0_30px_rgba(34,211,238,0.45),0_0_60px_rgba(217,70,239,0.22)] backdrop-blur-xl">
+//             <GraduationCap size={42} className="text-cyan-300" />
+//           </div>
+//         </div>
+
+//         <h1 className="text-center text-2xl sm:text-3xl font-black uppercase tracking-[0.18em] bg-gradient-to-r from-cyan-300 via-violet-300 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(34,211,238,0.9)] leading-tight break-words">
+//           PRAYAS CHARITABLE TRUST
+//         </h1>
+
+//         <p className="mt-3 text-center text-sm sm:text-base text-slate-300">
+//           WELCOME TO PRAYAS STUDENT PORTAL CLASS 10th
+//         </p>
+
+//         {/* Username */}
+//         <div className="relative mt-8 mb-5">
+//           <User
+//             size={20}
+//             className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-300/90"
+//           />
+
+//           <input
+//             type="text"
+//             placeholder="Username / Student Code"
+//             value={username}
+//             onChange={(e) => setUsername(e.target.value)}
+//             className="w-full rounded-2xl border border-cyan-400/25 bg-slate-900/55 pl-12 pr-4 py-3 text-white placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-cyan-300 focus:bg-slate-900/70 focus:ring-2 focus:ring-cyan-400/25 focus:shadow-[0_0_30px_rgba(34,211,238,0.28)]"
+//           />
+//         </div>
+
+//         {/* Password */}
+//         <div className="relative mb-6">
+//   <Lock
+//     size={20}
+//     className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-300"
+//   />
+
+//   <input
+//     type={showPassword ? "text" : "password"}
+//     placeholder="Password"
+//     value={password}
+//     onChange={(e) => setPassword(e.target.value)}
+//     className="w-full rounded-2xl border border-cyan-400/20 bg-slate-900/70 py-3 pl-12 pr-12 text-white placeholder:text-slate-500 outline-none transition-all duration-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 shadow-[0_0_15px_rgba(34,211,238,0.15)] backdrop-blur-xl"
+//   />
+
+//   <button
+//     type="button"
+//     onClick={(e) => {
+//       e.preventDefault();
+//       setShowPassword((prev) => !prev);
+//     }}
+//     className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-300 transition-colors duration-300"
+//   >
+//     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+//   </button>
+// </div>
+
+//         <button
+//           onClick={login}
+//           className="group relative w-full overflow-hidden rounded-2xl border border-cyan-400/40 bg-gradient-to-r from-cyan-400 via-violet-500 to-fuchsia-500 py-3 text-sm sm:text-base font-bold uppercase tracking-[0.16em] text-white shadow-[0_0_30px_rgba(34,211,238,0.45),0_0_70px_rgba(217,70,239,0.28)] transition-all duration-300 hover:scale-[1.02] hover:border-cyan-300/60 hover:shadow-[0_0_40px_rgba(34,211,238,0.6),0_0_90px_rgba(217,70,239,0.4)] active:scale-[0.99]"
+//         >
+//           <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(circle_at_left,rgba(255,255,255,0.28),transparent_60%)]" />
+
+//           <span className="relative flex items-center justify-center gap-2">
+//             ⚡ Login
+//           </span>
+//         </button>
+//       </div>
+//     </div>
+//   </div>
+// );
+
 
 export function Login() {
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Independence Day theme ONLY on 15 August
+  const today = new Date();
+  const isIndependenceDay =
+    today.getDate() === 15 && today.getMonth() === 7;
 
   const login = async () => {
     try {
@@ -20,151 +151,388 @@ export function Login() {
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
-      if (res.data.role === "student") {
-  localStorage.setItem("studentName", res.data.student.name);
-  localStorage.setItem("rollNo", res.data.student.rollNo);
-  localStorage.setItem("studentCode", res.data.student.studentCode);
-}
 
-      if (res.data.role === "admin") {
+      if (res.data.role === "student") {
+        localStorage.setItem("studentName", res.data.student.name);
+        localStorage.setItem("rollNo", res.data.student.rollNo);
+        localStorage.setItem("studentCode", res.data.student.studentCode);
+      }
+
+      if (res.data.role === "admin" || res.data.role === "teacher") {
         navigate("/admin");
       } else {
         navigate("/student");
       }
     } catch (err) {
+      console.log(err.response?.data);
+      console.log(err);
       alert(err.response?.data?.message || "Login Failed");
     }
   };
-return (
-  <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0b1020] px-4 py-8">
-    {/* Dynamic Cyberpunk Background */}
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.28),transparent_32%),radial-gradient(circle_at_top_right,rgba(217,70,239,0.26),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,85,247,0.22),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.22),transparent_32%),linear-gradient(135deg,#0f172a_0%,#111827_35%,#1e1b4b_70%,#0f172a_100%)]" />
 
-    {/* Animated Neon Grid */}
-    <div className="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(217,70,239,0.08)_1px,transparent_1px)] bg-[size:36px_36px] opacity-70" />
+  return (
+    <div
+      className={`relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 ${
+        isIndependenceDay
+          ? "bg-[#020806]"
+          : "bg-[#0b1020]"
+      }`}
+    >
+      {/* =========================================================
+          INDEPENDENCE DAY BACKGROUND
+         ========================================================= */}
 
-    {/* Moving Glow Orbs */}
-    <div className="absolute -top-24 -left-20 h-[26rem] w-[26rem] rounded-full bg-cyan-400/40 blur-[140px] animate-pulse" />
-    <div className="absolute top-8 right-[-4rem] h-[24rem] w-[24rem] rounded-full bg-fuchsia-500/40 blur-[150px] animate-pulse" />
-    <div className="absolute bottom-[-6rem] left-1/4 h-[22rem] w-[22rem] rounded-full bg-violet-500/35 blur-[140px] animate-pulse" />
-    <div className="absolute bottom-10 right-1/4 h-[18rem] w-[18rem] rounded-full bg-blue-400/30 blur-[120px] animate-pulse" />
+      <div
+        className={`absolute inset-0 ${
+          isIndependenceDay
+            ? "bg-[radial-gradient(circle_at_0%_50%,rgba(255,153,51,0.20),transparent_32%),radial-gradient(circle_at_100%_50%,rgba(19,136,8,0.20),transparent_32%),radial-gradient(circle_at_50%_100%,rgba(255,255,255,0.035),transparent_35%),linear-gradient(135deg,#050a07_0%,#07100b_45%,#020705_100%)]"
+            : "bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.28),transparent_32%),radial-gradient(circle_at_top_right,rgba(217,70,239,0.26),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,85,247,0.22),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.22),transparent_32%),linear-gradient(135deg,#0f172a_0%,#111827_35%,#1e1b4b_70%,#0f172a_100%)]"
+        }`}
+      />
 
-    {/* Center Ambient Glow */}
-    <div className="absolute inset-x-0 top-1/2 mx-auto h-56 w-[80%] rounded-full bg-gradient-to-r from-cyan-400/15 via-fuchsia-400/15 to-violet-400/15 blur-[120px]" />
+      {/* =========================================================
+          PREMIUM GRID
+         ========================================================= */}
 
-    <div className="relative z-10 w-full max-w-sm sm:max-w-md">
-      <div className="relative overflow-hidden rounded-[2rem] border border-cyan-400/30 bg-slate-900/45 p-6 sm:p-8 shadow-[0_0_30px_rgba(34,211,238,0.28),0_0_90px_rgba(168,85,247,0.22),0_0_120px_rgba(217,70,239,0.16),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(34,211,238,0.10),transparent_30%,rgba(217,70,239,0.10))] before:pointer-events-none after:absolute after:-inset-px after:rounded-[2rem] after:border after:border-white/8 after:pointer-events-none">
-        <div className="mb-6 flex justify-center">
-          <div className="rounded-full border border-cyan-400/40 bg-cyan-500/15 p-4 shadow-[0_0_30px_rgba(34,211,238,0.45),0_0_60px_rgba(217,70,239,0.22)] backdrop-blur-xl">
-            <GraduationCap size={42} className="text-cyan-300" />
-          </div>
-        </div>
+      <div
+        className={`absolute inset-0 ${
+          isIndependenceDay
+            ? "bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:42px_42px]"
+            : "bg-[linear-gradient(rgba(34,211,238,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(217,70,239,0.08)_1px,transparent_1px)] bg-[size:36px_36px] opacity-70"
+        }`}
+      />
 
-        <h1 className="text-center text-2xl sm:text-3xl font-black uppercase tracking-[0.18em] bg-gradient-to-r from-cyan-300 via-violet-300 to-pink-400 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(34,211,238,0.9)] leading-tight break-words">
-          PRAYAS CHARITABLE TRUST
-        </h1>
+      {/* =========================================================
+          TRICOLOR LIGHT BARS
+         ========================================================= */}
 
-        <p className="mt-3 text-center text-sm sm:text-base text-slate-300">
-          WELCOME TO PRAYAS STUDENT PORTAL CLASS 10th
-        </p>
+      {isIndependenceDay && (
+        <>
+          <div className="absolute left-0 top-0 h-full w-[20%] bg-gradient-to-r from-orange-500/[0.06] to-transparent blur-3xl" />
 
-        {/* Username */}
-        <div className="relative mt-8 mb-5">
-          <User
-            size={20}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-300/90"
-          />
+          <div className="absolute right-0 top-0 h-full w-[20%] bg-gradient-to-l from-green-600/[0.06] to-transparent blur-3xl" />
 
-          <input
-            type="text"
-            placeholder="Username / Student Code"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full rounded-2xl border border-cyan-400/25 bg-slate-900/55 pl-12 pr-4 py-3 text-white placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-cyan-300 focus:bg-slate-900/70 focus:ring-2 focus:ring-cyan-400/25 focus:shadow-[0_0_30px_rgba(34,211,238,0.28)]"
-          />
-        </div>
+          <div className="absolute left-1/2 top-0 h-[1px] w-[55%] -translate-x-1/2 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
-        {/* Password */}
-        <div className="relative mb-6">
-          <Lock
-            size={20}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-fuchsia-300/90"
-          />
+          <div className="absolute bottom-0 left-1/2 h-[1px] w-[55%] -translate-x-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        </>
+      )}
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-2xl border border-fuchsia-400/25 bg-slate-900/55 pl-12 pr-4 py-3 text-white placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-fuchsia-300 focus:bg-slate-900/70 focus:ring-2 focus:ring-fuchsia-400/25 focus:shadow-[0_0_30px_rgba(217,70,239,0.28)]"
-          />
-        </div>
+      {/* =========================================================
+          AMBIENT GLOW
+         ========================================================= */}
 
-        <button
-          onClick={login}
-          className="group relative w-full overflow-hidden rounded-2xl border border-cyan-400/40 bg-gradient-to-r from-cyan-400 via-violet-500 to-fuchsia-500 py-3 text-sm sm:text-base font-bold uppercase tracking-[0.16em] text-white shadow-[0_0_30px_rgba(34,211,238,0.45),0_0_70px_rgba(217,70,239,0.28)] transition-all duration-300 hover:scale-[1.02] hover:border-cyan-300/60 hover:shadow-[0_0_40px_rgba(34,211,238,0.6),0_0_90px_rgba(217,70,239,0.4)] active:scale-[0.99]"
+      <div
+        className={`absolute -left-40 top-1/4 h-[32rem] w-[32rem] rounded-full blur-[160px] animate-pulse ${
+          isIndependenceDay
+            ? "bg-orange-500/20"
+            : "bg-cyan-400/40"
+        }`}
+      />
+
+      <div
+        className={`absolute -right-40 top-1/3 h-[32rem] w-[32rem] rounded-full blur-[160px] animate-pulse ${
+          isIndependenceDay
+            ? "bg-green-600/20"
+            : "bg-fuchsia-500/40"
+        }`}
+      />
+
+      <div
+        className={`absolute bottom-[-12rem] left-1/2 h-[30rem] w-[45rem] -translate-x-1/2 rounded-full blur-[160px] ${
+          isIndependenceDay
+            ? "bg-white/[0.025]"
+            : "bg-violet-500/20"
+        }`}
+      />
+
+      {/* =========================================================
+          DECORATIVE PARTICLES
+         ========================================================= */}
+
+      {isIndependenceDay && (
+        <>
+          <div className="absolute left-[18%] top-[22%] h-1 w-1 rounded-full bg-orange-400 shadow-[0_0_12px_4px_rgba(255,153,51,0.5)] animate-pulse" />
+
+          <div className="absolute right-[18%] top-[28%] h-1 w-1 rounded-full bg-green-400 shadow-[0_0_12px_4px_rgba(19,136,8,0.5)] animate-pulse" />
+
+          <div className="absolute left-[12%] bottom-[25%] h-1 w-1 rounded-full bg-white/80 shadow-[0_0_10px_3px_rgba(255,255,255,0.3)] animate-pulse" />
+
+          <div className="absolute right-[13%] bottom-[20%] h-1 w-1 rounded-full bg-green-400 shadow-[0_0_12px_4px_rgba(19,136,8,0.4)] animate-pulse" />
+        </>
+      )}
+
+      {/* =========================================================
+          LOGIN CONTAINER
+         ========================================================= */}
+
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md">
+
+        {/* Tricolor outer glow */}
+        {isIndependenceDay && (
+          <div className="absolute -inset-[2px] rounded-[2rem] bg-gradient-to-b from-orange-500/50 via-white/20 to-green-600/50 opacity-70 blur-[3px]" />
+        )}
+
+        <div
+          className={`relative overflow-hidden rounded-[2rem] p-6 sm:p-8 backdrop-blur-2xl ${
+            isIndependenceDay
+              ? "border border-white/[0.16] bg-[#07100b]/85 shadow-[0_20px_80px_rgba(0,0,0,0.55),0_0_45px_rgba(255,153,51,0.10),0_0_80px_rgba(19,136,8,0.10)]"
+              : "border border-cyan-400/30 bg-slate-900/45 shadow-[0_0_30px_rgba(34,211,238,0.28),0_0_90px_rgba(168,85,247,0.22),0_0_120px_rgba(217,70,239,0.16),inset_0_1px_0_rgba(255,255,255,0.08)]"
+          }`}
         >
-          <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(circle_at_left,rgba(255,255,255,0.28),transparent_60%)]" />
 
-          <span className="relative flex items-center justify-center gap-2">
-            ⚡ Login
-          </span>
-        </button>
+          {/* =====================================================
+              TOP TRICOLOR LINE
+             ===================================================== */}
+
+          {isIndependenceDay && (
+            <div className="absolute left-0 right-0 top-0 h-[3px] bg-gradient-to-r from-orange-500 via-white to-green-600 shadow-[0_0_15px_rgba(255,255,255,0.18)]" />
+          )}
+
+          {/* =====================================================
+              SUBTLE ASHOKA CHAKRA
+             ===================================================== */}
+
+          {isIndependenceDay && (
+            <div className="pointer-events-none absolute -right-20 -top-20 opacity-[0.035]">
+              <div className="flex h-56 w-56 items-center justify-center rounded-full border-[14px] border-white">
+                <div className="flex h-36 w-36 items-center justify-center rounded-full border-4 border-white">
+                  <span className="text-7xl text-white">☸</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* =====================================================
+              LOGO
+             ===================================================== */}
+
+          <div className="relative mb-6 flex justify-center">
+
+            {isIndependenceDay && (
+              <div className="absolute h-24 w-24 rounded-full bg-gradient-to-r from-orange-500/20 via-white/10 to-green-500/20 blur-xl" />
+            )}
+
+            <div
+              className={`relative flex h-[88px] w-[88px] items-center justify-center rounded-full backdrop-blur-xl ${
+                isIndependenceDay
+                  ? "border border-white/25 bg-white/[0.045] shadow-[0_0_30px_rgba(255,153,51,0.15),0_0_60px_rgba(19,136,8,0.12)]"
+                  : "border border-cyan-400/40 bg-cyan-500/15 shadow-[0_0_30px_rgba(34,211,238,0.45),0_0_60px_rgba(217,70,239,0.22)]"
+              }`}
+            >
+              <GraduationCap
+                size={42}
+                className={
+                  isIndependenceDay
+                    ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.65)]"
+                    : "text-cyan-300"
+                }
+              />
+            </div>
+          </div>
+
+          {/* =====================================================
+              TITLE
+             ===================================================== */}
+
+          <h1
+            className={`relative text-center text-2xl sm:text-3xl font-black uppercase tracking-[0.20em] leading-[1.25] break-words bg-clip-text text-transparent ${
+              isIndependenceDay
+                ? "bg-gradient-to-r from-orange-400 via-white to-green-400 drop-shadow-[0_0_18px_rgba(255,255,255,0.18)]"
+                : "bg-gradient-to-r from-cyan-300 via-violet-300 to-pink-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.9)]"
+            }`}
+          >
+            PRAYAS CHARITABLE TRUST
+          </h1>
+
+          {/* =====================================================
+              INDEPENDENCE DAY MESSAGE
+             ===================================================== */}
+
+          {isIndependenceDay && (
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <span className="h-px w-8 bg-gradient-to-r from-transparent to-orange-400/70" />
+
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.22em] text-white/85">
+                🇮🇳 Happy Independence Day
+              </p>
+
+              <span className="h-px w-8 bg-gradient-to-l from-transparent to-green-400/70" />
+            </div>
+          )}
+
+          <p
+            className={`mt-4 text-center text-sm sm:text-base ${
+              isIndependenceDay
+                ? "text-white/60"
+                : "text-slate-300"
+            }`}
+          >
+            WELCOME TO PRAYAS STUDENT PORTAL CLASS 10th
+          </p>
+
+          {/* =====================================================
+              USERNAME
+             ===================================================== */}
+
+          <div className="relative mt-8 mb-5">
+
+            <User
+              size={20}
+              className={`absolute left-4 top-1/2 -translate-y-1/2 ${
+                isIndependenceDay
+                  ? "text-orange-400"
+                  : "text-cyan-300/90"
+              }`}
+            />
+
+            <input
+              type="text"
+              placeholder="Username / Student Code"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className={`w-full rounded-2xl py-3.5 pl-12 pr-4 outline-none transition-all duration-300 ${
+                isIndependenceDay
+                  ? "border border-white/[0.12] bg-black/30 text-white placeholder:text-white/35 hover:border-orange-400/30 focus:border-orange-400/60 focus:bg-black/40 focus:ring-2 focus:ring-orange-400/10 focus:shadow-[0_0_25px_rgba(255,153,51,0.15)]"
+                  : "border border-cyan-400/25 bg-slate-900/55 text-white placeholder:text-slate-400 focus:border-cyan-300 focus:bg-slate-900/70 focus:ring-2 focus:ring-cyan-400/25 focus:shadow-[0_0_30px_rgba(34,211,238,0.28)]"
+              }`}
+            />
+          </div>
+
+          {/* =====================================================
+              PASSWORD
+             ===================================================== */}
+
+          <div className="relative mb-6">
+
+            <Lock
+              size={20}
+              className={`absolute left-4 top-1/2 -translate-y-1/2 ${
+                isIndependenceDay
+                  ? "text-green-400"
+                  : "text-cyan-300"
+              }`}
+            />
+
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`w-full rounded-2xl py-3.5 pl-12 pr-12 outline-none transition-all duration-300 ${
+                isIndependenceDay
+                  ? "border border-white/[0.12] bg-black/30 text-white placeholder:text-white/35 hover:border-green-400/30 focus:border-green-400/60 focus:bg-black/40 focus:ring-2 focus:ring-green-400/10 focus:shadow-[0_0_25px_rgba(19,136,8,0.15)]"
+                  : "border border-cyan-400/20 bg-slate-900/70 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 shadow-[0_0_15px_rgba(34,211,238,0.15)]"
+              }`}
+            />
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowPassword((prev) => !prev);
+              }}
+              className={`absolute right-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
+                isIndependenceDay
+                  ? "text-white/40 hover:text-white"
+                  : "text-slate-400 hover:text-cyan-300"
+              }`}
+            >
+              {showPassword ? (
+                <EyeOff size={20} />
+              ) : (
+                <Eye size={20} />
+              )}
+            </button>
+          </div>
+
+          {/* =====================================================
+              PREMIUM TRICOLOR LOGIN BUTTON
+             ===================================================== */}
+
+          <button
+            onClick={login}
+            className={`group relative w-full overflow-hidden rounded-2xl py-3.5 text-sm sm:text-base font-black uppercase tracking-[0.18em] transition-all duration-300 hover:scale-[1.015] active:scale-[0.99] ${
+              isIndependenceDay
+                ? "border border-white/20 bg-gradient-to-r from-orange-500 via-white via-[52%] to-green-600 text-black shadow-[0_0_30px_rgba(255,153,51,0.22),0_0_50px_rgba(19,136,8,0.16)] hover:shadow-[0_0_40px_rgba(255,153,51,0.30),0_0_70px_rgba(19,136,8,0.25)]"
+                : "border border-cyan-400/40 bg-gradient-to-r from-cyan-400 via-violet-500 to-fuchsia-500 text-white shadow-[0_0_30px_rgba(34,211,238,0.45),0_0_70px_rgba(217,70,239,0.28)] hover:border-cyan-300/60 hover:shadow-[0_0_40px_rgba(34,211,238,0.6),0_0_90px_rgba(217,70,239,0.4)]"
+            }`}
+          >
+            {/* Shine */}
+            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/35 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+
+            {/* Hover glow */}
+            <div
+              className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
+                isIndependenceDay
+                  ? "bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.35),transparent_65%)]"
+                  : "bg-[radial-gradient(circle_at_left,rgba(255,255,255,0.28),transparent_60%)]"
+              }`}
+            />
+
+            <span className="relative flex items-center justify-center gap-3">
+              <span className="text-base">⚡</span>
+              <span>Login</span>
+            </span>
+          </button>
+
+          {/* =====================================================
+              BOTTOM DECORATION
+             ===================================================== */}
+
+          {isIndependenceDay && (
+            <div className="mt-6 flex items-center justify-center gap-2">
+              <span className="h-[2px] w-10 rounded-full bg-orange-500/60" />
+              <span className="h-[2px] w-10 rounded-full bg-white/70" />
+              <span className="h-[2px] w-10 rounded-full bg-green-500/60" />
+            </div>
+          )}
+
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 }
 
 
 // ================= ADMIN =================
 
 export function AdminDashboard() {
-  const [page, setPage] = useState("dashboard");
+  const role = localStorage.getItem("role");
+  const [page, setPage] = useState(role === "teacher" ? "students" : "dashboard");
+  const [search, setSearch] = useState("");
 
-  const menus = [
-    {
-      id: "dashboard",
-      title: "Dashboard",
-      icon: <LayoutDashboard size={20} />,
-    },
-    {
-      id: "students",
-      title: "Students",
-      icon: <Users size={20} />,
-    },
-    {
-      id: "tests",
-      title: "Tests",
-      icon: <FileText size={20} />,
-    },
-    {
-      id: "results",
-      title: "Results",
-      icon: <ClipboardList size={20} />,
-    },
-  ];
+const menus = role === "teacher"
+  ? [
+      { id: "dashboard", title: "Dashboard", icon: <LayoutDashboard size={20} /> },
+      { id: "students", title: "Students", icon: <Users size={20} /> },
+      { id: "results", title: "Results", icon: <FileText size={20} /> },
+    ]
+  : [
+      { id: "dashboard", title: "Dashboard", icon: <LayoutDashboard size={20} /> },
+      { id: "students", title: "Students", icon: <Users size={20} /> },
+      { id: "tests", title: "Tests", icon: <ClipboardList size={20} /> },
+      { id: "results", title: "Results", icon: <FileText size={20} /> },
+    ];
 
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row bg-[#020817] text-white overflow-x-hidden">
-    <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col lg:flex-row overflow-x-hidden overflow-y-auto touch-pan-y">
+    <div className="min-h-screen bg-[#02030a] text-white flex flex-col lg:flex-row overflow-y-auto touch-pan-y">
+
 
       {/* Background Glow */}
 
-      <div className="fixed -top-40 -left-40 h-96 w-96 rounded-full bg-violet-500/20 blur-[170px]" />
+      <div className="fixed -top-40 -left-40 h-96 w-96 rounded-full bg-violet-500/20 blur-[170px] pointer-events-none" />
 
-<div className="fixed top-20 right-10 h-80 w-80 rounded-full bg-cyan-500/15 blur-[170px]" />
+    <div className="fixed top-20 right-10 h-80 w-80 rounded-full bg-cyan-500/15 blur-[170px] pointer-events-none" />
 
-<div className="fixed bottom-10 left-1/3 h-72 w-72 rounded-full bg-pink-500/15 blur-[170px]" />
+    <div className="fixed bottom-10 left-1/3 h-72 w-72 rounded-full bg-pink-500/15 blur-[170px] pointer-events-none" />
 
-<div className="fixed bottom-0 right-0 h-[450px] w-[450px] rounded-full bg-green-500/10 blur-[180px]" />
+    <div className="fixed bottom-0 right-0 h-[450px] w-[450px] rounded-full bg-green-500/10 blur-[180px] pointer-events-none" />
 
-<div className="fixed top-1/2 left-1/2 h-60 w-60 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-[180px]" />
+    <div className="fixed top-1/2 left-1/2 h-60 w-60 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-[180px] pointer-events-none" />
 
-      {/* Sidebar */}
-
-      <aside className="relative z-10 w-full lg:w-64 shrink-0 bg-slate-950/70 backdrop-blur-2xl border-b lg:border-b-0 lg:border-r border-white/10 shadow-[0_0_80px_rgba(139,92,246,.15)] flex flex-col">
+    {/* Sidebar */}
+    <aside className="relative z-10 w-full lg:w-64 shrink-0 bg-slate-950/70 backdrop-blur-2xl border-b lg:border-b-0 lg:border-r border-white/10 shadow-[0_0_80px_rgba(139,92,246,.15)] flex flex-col">
 
         {/* Logo */}
 
@@ -261,56 +629,59 @@ export function AdminDashboard() {
 
       {/* Main */}
 
-      <div className="flex-1 flex flex-col pb-16 lg:pb-0">
+       <div className="flex-1 flex flex-col pb-16 lg:pb-0 min-h-screen overflow-y-auto">
+
 
         {/* Navbar */}
 
         <header className="bg-[#0B1220]/80 backdrop-blur-xl border-b border-blue-500/20 px-4 py-4 sm:px-6 lg:px-10">
 
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+  <div className="flex flex-col gap-4 sm:gap-5 lg:flex-row lg:items-center lg:justify-between">
 
-  <div>
+    <div className="min-w-0 flex-1">
+      <h1 className="text-center lg:text-left text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 bg-clip-text text-transparent leading-tight break-words">
+        PRAYAS CHARITABLE TRUST
+      </h1>
 
-    <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+      <p className="mt-2 flex items-center justify-center lg:justify-start gap-2 text-sm sm:text-base text-slate-400">
+        <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+        <span>
+          {role === "teacher"
+            ? "Teacher access · View-only portal"
+            : "Administration portal · Manage students, tests, and results"}
+        </span>
+      </p>
+    </div>
 
-      PRAYAS CHARITABLE TRUST
+    <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center lg:w-auto lg:justify-end lg:gap-4">
+      <div className="relative flex-1 lg:flex-none">
+        <input
+  placeholder="Search students, tests, results..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  className="w-full rounded-xl border border-blue-500/20 bg-slate-900/80 px-4 py-3 text-sm sm:text-base text-white placeholder:text-slate-500 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 sm:w-72 lg:w-80"
+/>
+      </div>
 
-    </h1>
+      <div className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 text-sm font-bold text-white shadow-[0_0_30px_rgba(34,211,238,.35)] sm:mx-0 sm:h-12 sm:w-12 lg:h-14 lg:w-14">
+        {role === "teacher" ? "T" : "A"}
+      </div>
+    </div>
 
   </div>
 
-
-</div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 lg:gap-5">
-
-            <input
-              placeholder="Search..."
-              className="bg-slate-900/80 border border-blue-500/20 rounded-xl px-4 py-3 text-white w-full sm:w-64 lg:w-80 outline-none focus:border-cyan-400 transition"
-            />
-
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center font-bold text-white shadow-[0_0_30px_rgba(34,211,238,.35)]">
-
-              A
-
-            </div>
-
-          </div>
-
-        </header>
+</header>
 
         {/* Content */}
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-visible">
 
           {page === "dashboard" && <DashboardPage />}
-          {page === "students" && <StudentsPage />}
-          {page === "tests" && <TestsPage />}
-          {page === "results" && <ResultsPage />}
+{page === "students" && <StudentsPage search={search} />}
+{role !== "teacher" && page === "tests" && <TestsPage search={search} />}
+{page === "results" && <ResultsPage search={search} />}
 
         </main>
-
-      </div>
 
     </div>
     </div>
@@ -390,7 +761,7 @@ function DashboardPage() {
   return (
     <div>
 
-      <div className="mb-6 sm:mb-8 lg:mb-10">
+      <div className="mb-6 sm:mb-8 lg:mb-10 w-full overflow-x-hidden touch-pan-y">
   <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
     Dashboard
   </h1>
@@ -593,9 +964,12 @@ export function StudentDashboard() {
   const [page, setPage] = useState("dashboard");
 
 return (
-  <div className="relative flex flex-col lg:flex-row min-h-screen overflow-hidden bg-[#02030a] text-white">
+   <div className="min-h-screen bg-[#02030a] text-white flex flex-col lg:flex-row overflow-y-auto touch-pan-y">
+
+<div className="rounded-2xl border border-cyan-400/40 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 px-4 sm:px-5 py-4 shadow-[0_0_25px_rgba(34,211,238,0.25)]">
+
     {/* Sidebar */}
-    <div className="relative z-10 w-full lg:w-72 bg-slate-950/80 backdrop-blur-3xl border-r border-cyan-400/20 shadow-[0_0_60px_rgba(34,211,238,0.12)] p-4 lg:p-6 flex flex-col">
+    <div className="relative z-10 w-full lg:w-72 shrink-0 bg-slate-950/80 backdrop-blur-3xl border-b lg:border-b-0 lg:border-r border-cyan-400/20 shadow-[0_0_60px_rgba(34,211,238,0.12)] p-4 lg:p-6 flex flex-col">
       {/* Logo */}
       
 
@@ -756,11 +1130,11 @@ return (
     </div>
 
     {/* Main */}
-    <div className="relative flex-1 overflow-x-hidden bg-[#02030a] p-4 sm:p-6 lg:p-10">
+    <div className="relative flex-1 min-h-screen overflow-y-auto overflow-x-hidden bg-[#02030a] p-4 sm:p-6 lg:p-10 touch-pan-y">
       {/* Cyberpunk Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-      <div className="relative z-10 rounded-[1.5rem] sm:rounded-[2rem] border border-cyan-400/10 bg-slate-950/45 p-4 sm:p-6 lg:p-8 shadow-[0_0_60px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+      <div className="relative z-10 w-full overflow-x-hidden rounded-[1.5rem] sm:rounded-[2rem] border border-cyan-400/10 bg-slate-950/45 p-4 sm:p-6 lg:p-8 shadow-[0_0_60px_rgba(0,0,0,0.45)] backdrop-blur-2xl touch-pan-y">
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
 
 
@@ -772,9 +1146,10 @@ return (
       </div>
 
       {/* Neon Glow Effects */}
-      <div className="absolute -top-40 -left-40 h-[30rem] w-[30rem] rounded-full bg-fuchsia-500/20 blur-[180px] animate-pulse" />
-      <div className="absolute top-1/3 -right-32 h-[26rem] w-[26rem] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse" />
-      <div className="absolute bottom-[-8rem] left-1/3 h-[22rem] w-[22rem] rounded-full bg-violet-500/20 blur-[150px] animate-pulse" />
+      <div className="pointer-events-none absolute -top-40 -left-40 h-[30rem] w-[30rem] rounded-full bg-fuchsia-500/20 blur-[180px] animate-pulse" />
+      <div className="pointer-events-none absolute top-1/3 -right-32 h-[26rem] w-[26rem] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse" />
+      <div className="pointer-events-none absolute bottom-[-8rem] left-1/3 h-[22rem] w-[22rem] rounded-full bg-violet-500/20 blur-[150px] animate-pulse" />
+    </div>
     </div>
   </div>
 );
@@ -916,8 +1291,10 @@ const highestMarks =
           </h2>
 
         </div>
-        <div className="w-full overflow-x-auto">
-  <table className="w-full table-fixed">
+        <div className="rounded-3xl border border-white/10 bg-slate-900/70 backdrop-blur-xl shadow-2xl">
+  <div className="overflow-x-auto overflow-y-hidden touch-pan-x rounded-3xl">
+
+    <table className="min-w-[720px] w-full table-fixed border-collapse">
 
           <thead>
 
@@ -986,6 +1363,7 @@ const highestMarks =
 
         </table>
         </div>
+        </div>
       </div>
     </>
   );
@@ -1049,35 +1427,31 @@ const highest = totalTests > 0
 
 </div>
 
-      <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl">
-  <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(139,92,246,.12)]">
-  <div className="w-full overflow-x-auto">
+      <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
 
-  <table className="min-w-[760px] w-full text-xs sm:text-sm">
+  <div className="w-full overflow-x-auto overflow-y-hidden touch-pan-x">
 
-    <thead className="bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500">
+    <table className="min-w-[760px] w-full border-collapse text-xs sm:text-sm text-slate-200">
 
-      <tr>
+        <thead className="sticky top-0 z-10 bg-[#111827]/95 backdrop-blur-xl border-b border-cyan-400/20 shadow-[0_4px_20px_rgba(34,211,238,0.08)]">
+  <tr>
+    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
+      🎓 Roll
+    </th>
 
-        <th className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 text-left text-[10px] sm:text-xs font-bold uppercase tracking-[2px] sm:tracking-[3px] text-white whitespace-nowrap">
-          📚 Test
-        </th>
+    <th className="px-5 py-4 text-left text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
+      👤 Student
+    </th>
 
-        <th className="px-8 py-5 text-center text-xs font-bold uppercase tracking-[3px] text-white">
-          📅 Date
-        </th>
+    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
+      📝 Marks
+    </th>
 
-        <th className="px-8 py-5 text-center text-xs font-bold uppercase tracking-[3px] text-white">
-          🎯 Marks
-        </th>
-
-        <th className="px-8 py-5 text-center text-xs font-bold uppercase tracking-[3px] text-white">
-          💬 Remarks
-        </th>
-
-      </tr>
-
-    </thead>
+    <th className="px-5 py-4 text-left text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
+      💬 Remarks
+    </th>
+  </tr>
+</thead>
 
     <tbody>
 
@@ -1086,19 +1460,14 @@ const highest = totalTests > 0
         <tr
           key={r._id}
           className={`
-            transition-all
-            duration-300
-            hover:bg-white/5
-            hover:scale-[1.01]
-hover:shadow-[0_0_25px_rgba(16,185,129,.15)]
-            border-b
-            border-white/5
-            ${
-              index % 2 === 0
-                ? "bg-slate-900/30"
-                : "bg-slate-500/20"
-            }
-          `}
+  group relative transition-all duration-300
+  ${index % 2 === 0
+    ? "bg-slate-900/45"
+    : "bg-slate-800/30"}
+  hover:bg-slate-800/60
+  hover:shadow-[0_0_35px_rgba(34,211,238,0.10)]
+  hover:-translate-y-[1px]
+`}
         >
 
           <td className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5">
@@ -1189,12 +1558,13 @@ hover:shadow-[0_0_25px_rgba(16,185,129,.15)]
 
   </table>
   </div>
-
-</div>
       </div>
     </>
   );
 }
+
+
+
 
 function StudentPerformance() {
 
@@ -1486,10 +1856,12 @@ if (percentage >= 90) {
   );
 }
 
-function StudentsPage() {
+function StudentsPage({ search }) {
   const [students, setStudents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const role = localStorage.getItem("role");
+  const isReadOnly = role === "teacher"; 
 
 const [form, setForm] = useState({
   rollNo: "",
@@ -1504,7 +1876,7 @@ const [form, setForm] = useState({
 
   const loadStudents = async () => {
     try {
-      const res = await api.get("/students", {
+      const res = await api.get("/students-with-performance", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
@@ -1581,239 +1953,215 @@ const editStudent = (student) => {
   setShowForm(true);
 };
 
+const filteredStudents = students.filter((student) =>
+  student.name.toLowerCase().includes(search.toLowerCase()) ||
+  student.rollNo.toString().includes(search) ||
+  student.studentCode.toLowerCase().includes(search.toLowerCase())
+);
+
   return (
     <>
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
-  <div>
-
-    <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+  <div className="min-w-0 flex-1">
+    <h1 className="text-center sm:text-left text-2xl sm:text-3xl lg:text-5xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-400 bg-clip-text text-transparent leading-tight">
       👨‍🎓 Student Management
     </h1>
 
-    <p className="mt-2 flex items-center gap-2 text-slate-400">
-
-      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-
-      Welcome back,
-      <span className="font-semibold text-white">
-        Administrator
+    <p className="mt-2 flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left text-sm sm:text-base text-slate-400">
+      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+      <span>
+        Welcome back,
+        <span className="font-semibold text-white ml-1">Administrator</span>
       </span>
-
-      <span className="text-xl">👋</span>
-
+      <span className="text-xl shrink-0">👋</span>
     </p>
-
   </div>
 
-  <button
-    onClick={() => {
-      setEditingId(null);
-
-      setForm({
-        rollNo: "",
-        name: "",
-        studentCode: "",
-        password: "",
-      });
-
-      setShowForm(true);
-    }}
-    className="group rounded-2xl bg-gradient-to-r from-emerald-500 via-green-500 to-cyan-500 px-6 py-3 font-semibold text-white shadow-[0_0_25px_rgba(34,197,94,.35)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(34,197,94,.6)]"
-  >
-    <span className="mr-2 text-lg transition-transform duration-300 group-hover:rotate-90 inline-block">
-      +
-    </span>
-
-    Add Student
-  </button>
+  {!isReadOnly && (
+    <div className="flex justify-center sm:justify-end">
+      <button
+        onClick={() => {
+          setEditingId(null);
+          setForm({
+            rollNo: "",
+            name: "",
+            studentCode: "",
+            password: "",
+          });
+          setShowForm(true);
+        }}
+        className="group inline-flex items-center justify-center gap-2 w-full sm:w-auto rounded-2xl bg-gradient-to-r from-emerald-500 via-green-500 to-cyan-500 px-5 sm:px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_0_25px_rgba(34,197,94,.35)] transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105 hover:shadow-[0_0_40px_rgba(34,197,94,.6)] whitespace-nowrap"
+      >
+        <span className="text-lg transition-transform duration-300 group-hover:rotate-90">+</span>
+        <span>Add Student</span>
+      </button>
+    </div>
+  )}
 
 </div>
 
 {showForm && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
 
-    <div className="w-[450px] rounded-3xl border border-white/10 bg-[#111827]/95 p-8 shadow-[0_0_50px_rgba(168,85,247,.25)] backdrop-blur-2xl">
+    <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#111827]/95 p-5 sm:p-6 lg:p-8 shadow-[0_0_50px_rgba(168,85,247,.25)] backdrop-blur-2xl">
 
-      <h2 className="mb-6 text-3xl font-bold text-white">
-  {editingId ? "Edit Student" : "Add Student"}
-</h2>
+      <h2 className="mb-5 text-center sm:text-left text-2xl sm:text-3xl font-bold text-white">
+        {editingId ? "✏ Edit Student" : "➕ Add Student"}
+      </h2>
 
-      <input
-        placeholder="Roll No"
-        className="mb-4 w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
-        value={form.rollNo}
-        onChange={(e) =>
-          setForm({ ...form, rollNo: e.target.value })
-        }
-      />
+      <div className="space-y-4">
+        <input
+          placeholder="Roll No"
+          className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+          value={form.rollNo}
+          onChange={(e) => setForm({ ...form, rollNo: e.target.value })}
+        />
 
-      <input
-        placeholder="Student Name"
-        className="mb-4 w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
-        value={form.name}
-        onChange={(e) =>
-          setForm({ ...form, name: e.target.value })
-        }
-      />
+        <input
+          placeholder="Student Name"
+          className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
 
-      <input
-        placeholder="Student Code"
-        className="mb-4 w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
-        value={form.studentCode}
-        onChange={(e) =>
-          setForm({ ...form, studentCode: e.target.value })
-        }
-      />
+        <input
+          placeholder="Student Code"
+          className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+          value={form.studentCode}
+          onChange={(e) => setForm({ ...form, studentCode: e.target.value })}
+        />
 
-      <input
-        placeholder="Password"
-        type="password"
-        className="mb-4 w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
-        value={form.password}
-        onChange={(e) =>
-          setForm({ ...form, password: e.target.value })
-        }
-      />
+        <input
+          placeholder="Password"
+          type="password"
+          className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+        />
+      </div>
 
-      <div className="flex justify-end gap-3">
-
+      <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
         <button
           onClick={() => setShowForm(false)}
-          className="rounded-xl bg-slate-700 px-5 py-3 text-white hover:bg-slate-600 transition"
+          className="w-full sm:w-auto rounded-xl bg-slate-700 px-5 py-3 text-white hover:bg-slate-600 transition"
         >
           Cancel
         </button>
 
         <button
-  onClick={() => editStudent(student)}
-  className="text-blue-600 mr-3"
->
-  Edit
-</button>
-
-        <button
           onClick={addStudent}
-          className="rounded-xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 px-6 py-3 font-semibold text-white hover:scale-105 transition-all duration-300"
+          className="w-full sm:w-auto rounded-xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 px-6 py-3 font-semibold text-white hover:scale-[1.02] sm:hover:scale-105 transition-all duration-300"
         >
-          {editingId ? "Update" : "Save"}
+          {editingId ? "Update Student" : "Save Student"}
         </button>
-
       </div>
 
     </div>
-
   </div>
 )}
-      <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80/80 backdrop-blur-xl shadow-2xl">
- <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(139,92,246,.12)]">
+      <div className="rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl">
+  <div className="overflow-x-auto overflow-y-hidden touch-pan-x rounded-3xl">
 
-  <table className="w-full">
+    <table className="min-w-[760px] w-full table-fixed border-collapse">
 
     <thead className="bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-500">
+  <tr>
+    <th className="w-20 px-3 py-3 text-center text-[11px] font-bold uppercase tracking-[2px] text-white">
+      🎓 Roll
+    </th>
 
-      <tr>
+    <th className="w-64 px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[2px] text-white">
+      👤 Student
+    </th>
 
-        <th className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 text-left text-[10px] sm:text-xs font-bold uppercase tracking-[2px] sm:tracking-[3px] text-white whitespace-nowrap">
-          🎓 Roll No
-        </th>
+    <th className="w-44 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-[2px] text-white">
+      🆔 Student Code
+    </th>
 
-        <th className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 text-left text-[10px] sm:text-xs font-bold uppercase tracking-[2px] sm:tracking-[3px] text-white whitespace-nowrap">
-          👤 Student
-        </th>
+    <th className="w-28 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-[2px] text-white">
+      📊 Avg %
+    </th>
 
-        <th className="px-8 py-5 text-center text-xs font-bold uppercase tracking-[3px] text-white">
-          🆔 Student Code
-        </th>
-
-        <th className="px-8 py-5 text-center text-xs font-bold uppercase tracking-[3px] text-white">
-          ⚙ Actions
-        </th>
-
-      </tr>
-
-    </thead>
+    {!isReadOnly && (
+      <th className="w-44 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-[2px] text-white">
+        ⚙ Actions
+      </th>
+    )}
+  </tr>
+</thead>
 
     <tbody>
 
-      {students.map((student, index) => (
+      {filteredStudents.map((student, index) => (
 
         <tr
-          key={student._id}
-          className={`
-            transition-all
-            duration-300
-            hover:bg-white/5
-            hover:scale-[1.01]
-hover:shadow-[0_0_25px_rgba(16,185,129,.15)]
-            border-b
-            border-white/5
-            ${
-              index % 2 === 0
-                ? "bg-slate-900/30"
-                : "bg-slate-500/20"
-            }
-          `}
+  key={student._id}
+  className={`
+    border-b border-white/5
+    transition-colors duration-200
+    hover:bg-white/5
+    ${index % 2 === 0 ? "bg-slate-900/30" : "bg-slate-600/20"}
+  `}
+>
+
+  <td className="px-3 py-3 text-center font-semibold text-cyan-300 align-middle">
+    #{student.rollNo}
+  </td>
+
+  <td className="px-5 py-4 align-middle">
+  <div className="flex items-center gap-3">
+
+    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 via-violet-500 to-fuchsia-500 text-sm font-black text-white shadow-[0_0_20px_rgba(34,211,238,0.35)]">
+      {student.name?.charAt(0).toUpperCase()}
+    </div>
+
+    <div className="min-w-0">
+      <p className="truncate font-semibold text-white" title={student.name}>
+        {student.name}
+      </p>
+
+      <p className="text-xs text-slate-400">
+        Academic Record
+      </p>
+    </div>
+
+  </div>
+</td>
+
+  <td className="px-4 py-3 text-center align-middle">
+    <span className="inline-flex max-w-[150px] items-center justify-center rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 font-mono text-sm text-cyan-300 truncate" title={student.studentCode}>
+      {student.studentCode}
+    </span>
+  </td>
+
+  <td className="px-4 py-3 text-center align-middle">
+    <span className="inline-flex items-center rounded-lg border border-cyan-400/30 bg-cyan-500/10 px-3 py-1 text-sm font-bold text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.25)]">
+      {student.averagePercentage ?? "0.0"}%
+    </span>
+  </td>
+
+  {!isReadOnly && (
+    <td className="px-4 py-3 align-middle">
+      <div className="flex justify-center gap-2">
+        <button
+          onClick={() => editStudent(student)}
+          className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 px-3 py-2 text-xs font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02]"
         >
+          ✏ Edit
+        </button>
 
-          <td className="px-8 py-5 text-left font-semibold text-cyan-300">
-            #{student.rollNo}
-          </td>
+        <button
+          onClick={() => deleteStudent(student._id)}
+          className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-rose-500 to-pink-600 px-3 py-2 text-xs font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02]"
+        >
+          🗑 Delete
+        </button>
+      </div>
+    </td>
+  )}
 
-          <td className="px-8 py-5">
-
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 lg:gap-5">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 text-sm font-bold text-white shadow-lg">
-                {student.name.charAt(0).toUpperCase()}
-              </div>
-
-              <div>
-
-                <p className="font-semibold text-white">
-                  {student.name}
-                </p>
-
-                <p className="text-sm text-slate-400">
-                  Student
-                </p>
-
-              </div>
-
-            </div>
-
-          </td>
-
-          <td className="px-8 py-5 text-center">
-
-            <span className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 font-mono text-cyan-300">
-              {student.studentCode}
-            </span>
-
-          </td>
-
-          <td className="px-8 py-5">
-
-            <div className="flex justify-center gap-3">
-
-              <button
-                onClick={() => editStudent(student)}
-                className="rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/40"
-              >
-                ✏ Edit
-              </button>
-
-              <button
-                onClick={() => deleteStudent(student._id)}
-                className="rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-rose-500/40"
-              >
-                🗑 Delete
-              </button>
-
-            </div>
-
-          </td>
-
-        </tr>
+</tr>
 
       ))}
 
@@ -1826,7 +2174,7 @@ hover:shadow-[0_0_25px_rgba(16,185,129,.15)]
   );
 }
 
-function TestsPage() {
+function TestsPage({ search = "" }) {
   const [tests, setTests] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
@@ -1879,41 +2227,43 @@ function TestsPage() {
     }
   };
 
+  const filteredTests = tests.filter((test) =>
+  test.testName.toLowerCase().includes(search.toLowerCase()) ||
+  new Date(test.date)
+    .toLocaleDateString("en-IN")
+    .includes(search) ||
+  test.totalMarks.toString().includes(search)
+);
+
   return (
     <>
-      <div className="mb-10 flex items-center justify-between">
+      <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
-  <div>
-
-    <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black tracking-tight bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent drop-shadow-lg break-words leading-tight text-center sm:text-left">
-
+  <div className="min-w-0 flex-1">
+    <h1 className="text-center sm:text-left text-2xl sm:text-3xl lg:text-5xl font-black tracking-tight bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent leading-tight break-words">
       📝 Test Management
-
     </h1>
 
-    <p className="mt-2 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 text-center sm:text-left text-sm sm:text-base text-slate-400">
+    <p className="mt-2 flex items-center justify-center gap-2 text-center text-sm sm:text-base text-slate-400 w-full">
+  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0 shadow-[0_0_10px_rgba(52,211,153,0.8)]"></span>
 
-      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-
-      Create and manage examination schedules
-
-    </p>
-
+  <span className="break-words">
+    Create and manage examination schedules
+  </span>
+</p>
   </div>
 
-        <button
-          onClick={() => setShowForm(true)}
-          className="group w-full sm:w-auto rounded-2xl bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 px-5 sm:px-7 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,.35)] transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105 hover:shadow-[0_0_45px_rgba(16,185,129,.55)] whitespace-nowrap"        >
-          <>
-  <span className="mr-2 inline-block text-lg transition-transform duration-300 group-hover:rotate-90">
-    +
-  </span>
+  <div className="flex justify-center sm:justify-end">
+    <button
+      onClick={() => setShowForm(true)}
+      className="group inline-flex items-center justify-center gap-2 w-full sm:w-auto rounded-2xl bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 px-5 sm:px-7 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,.35)] transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105 hover:shadow-[0_0_45px_rgba(16,185,129,.55)] whitespace-nowrap"
+    >
+      <span className="text-base sm:text-lg">📝</span>
+      <span>Create New Test</span>
+    </button>
+  </div>
 
-  📝 Create New Test
-</>
-        </button>
-
-      </div>
+</div>
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
@@ -1974,10 +2324,10 @@ function TestsPage() {
         </div>
       )}
 
-      <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl">
-  <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(139,92,246,.12)]">
+      <div className="rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl">
+  <div className="overflow-x-auto overflow-y-hidden touch-pan-x rounded-3xl">
 
-  <table className="w-full">
+    <table className="min-w-[720px] w-full table-fixed border-collapse">
     <div className="w-full overflow-x-auto">
   <table className="min-w-[700px] w-full text-xs sm:text-sm">
 
@@ -2003,24 +2353,19 @@ function TestsPage() {
 
     <tbody>
 
-      {tests.map((test, index) => (
+      {filteredTests.map((test, index) => (
 
         <tr
           key={test._id}
           className={`
-            transition-all
-            duration-300
-            hover:bg-white/5
-            hover:scale-[1.01]
-hover:shadow-[0_0_25px_rgba(16,185,129,.15)]
-            border-b
-            border-white/5
-            ${
-              index % 2 === 0
-                ? "bg-slate-900/30"
-                : "bg-slate-500/20"
-            }
-          `}
+  group relative transition-all duration-300
+  ${index % 2 === 0
+    ? "bg-slate-900/45"
+    : "bg-slate-800/30"}
+  hover:bg-slate-800/60
+  hover:shadow-[0_0_35px_rgba(34,211,238,0.10)]
+  hover:-translate-y-[1px]
+`}
         >
 
           <td className="px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5">
@@ -2067,15 +2412,16 @@ hover:shadow-[0_0_25px_rgba(16,185,129,.15)]
 
 </div>
       </div>
-
     </>
   );
 }
 
-function ResultsPage() {
+function ResultsPage({ search }) {
   const [tests, setTests] = useState([]);
   const [selectedTest, setSelectedTest] = useState("");
   const [students, setStudents] = useState([]);
+  const role = localStorage.getItem("role");
+  const isReadOnly = role === "teacher";
 
   useEffect(() => {
     loadTests();
@@ -2125,27 +2471,30 @@ const saveResults = async () => {
   }
 };
 
+const filteredStudents = students.filter((student) =>
+  student.name.toLowerCase().includes(search.toLowerCase()) ||
+  student.rollNo.toString().includes(search) ||
+  (student.remarks || "")
+    .toLowerCase()
+    .includes(search.toLowerCase()) ||
+  student.marks.toString().includes(search)
+);
+
   return (
   <>
-      <div className="mb-10 flex items-center justify-between">
+      <div className="mb-6 sm:mb-8 flex flex-col items-center text-center">
 
-  <div>
+  <h1 className="w-full text-center text-2xl sm:text-3xl lg:text-5xl font-black tracking-tight bg-gradient-to-r from-orange-400 via-pink-500 to-violet-500 bg-clip-text text-transparent drop-shadow-lg leading-tight break-words">
+    📄 Result Management
+  </h1>
 
-    <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black tracking-tight bg-gradient-to-r from-orange-400 via-pink-500 to-violet-500 bg-clip-text text-transparent drop-shadow-lg break-words leading-tight text-center sm:text-left">
+  <p className="mt-3 flex items-center justify-center gap-2 text-center text-sm sm:text-base text-slate-400 max-w-2xl w-full">
+    <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.9)]"></span>
 
-      📄 Result Management
-
-    </h1>
-
-    <p className="mt-2 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 text-center sm:text-left text-sm sm:text-base text-slate-400">
-
-      <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-
+    <span className="break-words">
       Enter marks and publish student results
-
-    </p>
-
-  </div>
+    </span>
+  </p>
 
 </div>
 
@@ -2155,17 +2504,17 @@ const saveResults = async () => {
   Select Test
 </label>
 
-  <select
-        value={selectedTest}
-        onChange={(e) => {
-  setSelectedTest(e.target.value);
+<select
+  value={selectedTest}
+  onChange={(e) => {
+    setSelectedTest(e.target.value);
 
-  if (e.target.value) {
-    loadStudents(e.target.value);
-  }
-}}
-        className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 sm:px-5 py-3 sm:py-4 text-sm sm:text-base text-white outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
-      >
+    if (e.target.value) {
+      loadStudents(e.target.value);
+    }
+  }}
+  className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 sm:px-5 py-3 sm:py-4 text-sm sm:text-base text-white outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
+>
         <option value="">Select Test</option>
 
         {tests.map((test) => (
@@ -2177,140 +2526,121 @@ const saveResults = async () => {
       </div>
      {students.length > 0 && (
   <>
-    <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl">
-  <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(236,72,153,.12)]">
+    <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <h2 className="text-lg sm:text-xl font-semibold text-white">
+        📋 Student Results
+      </h2>
 
-<table className="w-full">
+      <div className="text-sm text-slate-400">
+        Total Students: <span className="font-semibold text-white">{filteredStudents.length}</span>
+      </div>
+    </div>
 
-<thead className="bg-gradient-to-r from-orange-500 via-pink-500 to-violet-600">
+    <div className="rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-2xl">
+      <div className="overflow-x-auto overflow-y-hidden touch-pan-x rounded-3xl">
 
-<tr>
+        <table className="min-w-[820px] w-full table-fixed border-collapse">
 
-<th className="px-8 py-5 text-left text-xs uppercase tracking-[3px]">
-🎓 Roll No
-</th>
+          <thead className="sticky top-0 z-10 bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 text-white shadow-[0_8px_30px_rgba(34,211,238,0.18)]">
+  <tr>
+    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-[0.22em]">
+      🎓 Roll
+    </th>
 
-<th className="px-8 py-5 text-left text-xs uppercase tracking-[3px]">
-👤 Student
-</th>
+    <th className="px-5 py-4 text-left text-[11px] font-black uppercase tracking-[0.22em]">
+      👤 Student
+    </th>
 
-<th className="px-8 py-5 text-center text-xs uppercase tracking-[3px]">
-🎯 Marks
-</th>
+    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-[0.22em]">
+      📝 Marks
+    </th>
 
-<th className="px-8 py-5 text-center text-xs uppercase tracking-[3px]">
-💬 Remarks
-</th>
-
-</tr>
-
+    <th className="px-5 py-4 text-left text-[11px] font-black uppercase tracking-[0.22em]">
+      💬 Remarks
+    </th>
+  </tr>
 </thead>
 
-<tbody>
+          <tbody>
+            {filteredStudents.map((student, index) => (
+              <tr
+                key={student.studentId}
+                className={`
+                  border-b border-white/5
+                  transition-colors duration-200
+                  hover:bg-white/5
+                  ${index % 2 === 0 ? "bg-slate-900/30" : "bg-slate-800/20"}
+                `}
+              >
 
-{students.map((student,index)=>(
+                <td className="px-3 py-3 text-center font-semibold text-cyan-300 align-middle">
+                  #{student.rollNo}
+                </td>
 
-<tr
+                <td className="px-4 py-3 align-middle">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-white" title={student.name}>
+                      {student.name}
+                    </p>
+                    <p className="text-xs text-slate-400">Student</p>
+                  </div>
+                </td>
 
-key={student.studentId}
+                <td className="px-3 py-3 text-center align-middle">
+                  <input
+                    type="text"
+                    disabled={isReadOnly}
+                    value={student.marks}
+                    onChange={(e) => {
+                      const temp = [...students];
+                      temp[index].marks = e.target.value;
+                      setStudents(temp);
+                    }}
+                    className="h-10 w-24 rounded-xl border border-cyan-400/20 bg-slate-950/80 px-3 text-center text-sm font-semibold text-white outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/30 disabled:cursor-not-allowed disabled:opacity-70"
+                  />
+                </td>
 
-className={`
+                <td className="px-4 py-3 align-middle">
+                  <input
+                    type="text"
+                    disabled={isReadOnly}
+                    value={student.remarks}
+                    onChange={(e) => {
+                      const temp = [...students];
+                      temp[index].remarks = e.target.value;
+                      setStudents(temp);
+                    }}
+                    className="h-10 w-full min-w-[200px] rounded-xl border border-violet-400/15 bg-slate-950/80 px-4 text-sm text-white outline-none transition-all duration-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-70"
+                  />
+                </td>
 
-transition-all
+              </tr>
+            ))}
+          </tbody>
 
-duration-300
-
-hover:bg-white/5
-
-border-b
-
-border-white/5
-
-${index%2===0?"bg-slate-900/30":"bg-slate-800/20"}
-
-`}
-
->
-
-<td className="px-8 py-5 font-semibold text-cyan-300">
-
-#{student.rollNo}
-
-</td>
-
-<td className="px-8 py-5 text-white">
-
-{student.name}
-
-</td>
-
-<td className="px-8 py-5">
-
-<input
-
-type="text"
-
-value={student.marks}
-
-onChange={(e)=>{
-
-const temp=[...students];
-
-temp[index].marks=e.target.value;
-
-setStudents(temp);
-
-}}
-
-className="w-full sm:w-28 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-center text-sm sm:text-base text-white outline-none focus:border-pink-500"
-
-/>
-
-</td>
-
-<td className="px-8 py-5">
-
-<input
-
-type="text"
-
-value={student.remarks}
-
-onChange={(e)=>{
-
-const temp=[...students];
-
-temp[index].remarks=e.target.value;
-
-setStudents(temp);
-
-}}
-
-className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3 sm:px-4 py-2 text-sm sm:text-base text-white outline-none focus:border-pink-500"
-/>
-
-</td>
-
-</tr>
-
-))}
-
-</tbody>
-
-</table>
-
-</div>
+        </table>
+      </div>
     </div>
 
-    <div className="mt-5 flex justify-center sm:justify-end">
-      <button
-        onClick={saveResults}
-        className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-orange-500 via-pink-500 to-violet-600 px-5 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold text-white shadow-[0_0_30px_rgba(236,72,153,.35)] transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105 hover:shadow-[0_0_45px_rgba(236,72,153,.55)] whitespace-nowrap"      >
-        Save Results
-      </button>
-    </div>
+    {!isReadOnly && (
+      <div className="mt-5 flex justify-center sm:justify-end">
+        {isReadOnly && (<button
+          onClick={saveResults}
+          className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-orange-500 via-pink-500 to-violet-600 px-5 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold text-white shadow-[0_0_30px_rgba(236,72,153,.35)] transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105 hover:shadow-[0_0_45px_rgba(236,72,153,.55)] whitespace-nowrap"
+        >
+          💾 Save Results
+        </button>)}
+      </div>
+    )}
   </>
 )}
     </>
   );
 }
+
+export {
+  StudentsPage,
+  TestsPage,
+  ResultsPage,
+  DashboardPage,
+};
