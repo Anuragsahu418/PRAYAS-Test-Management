@@ -2040,12 +2040,14 @@ const filteredStudents = students.filter((student) =>
         />
 
         <input
-          placeholder="Password"
-          type="password"
-          className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-        />
+        placeholder={editingId ? "New Password (leave blank to keep current)" : "Password"}
+        type="password"
+        className="mb-4 w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+        value={form.password}
+        onChange={(e) =>
+          setForm({ ...form, password: e.target.value })
+        }
+      />
       </div>
 
       <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">

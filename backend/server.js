@@ -152,21 +152,36 @@ app.get("/api/students/search/:key", verifyToken, isAdminOrTeacher, async (req, 
 
 app.put("/api/students/:id", verifyToken, isAdmin, async (req, res) => {
   try {
-    const { studentCode, rollNo, name } = req.body;
+    const { studentCode, rollNo, name, password } = req.body;
 
-    const student = await Student.findByIdAndUpdate(
-      req.params.id,
-      {
-        studentCode,
-        rollNo,
-        name,
-      },
-      { new: true }
-    );
+    const student = await Student.findById(req.params.id);
+
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found",
+      });
+    }
+
+    // Update normal student information
+    student.studentCode = studentCode;
+    student.rollNo = rollNo;
+    student.name = name;
+
+    // Update password only if a new password was entered
+    if (password && password.trim() !== "") {
+      student.password = await bcrypt.hash(password, 10);
+    }
+
+    await student.save();
 
     res.json(student);
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Update student error:", err);
+
+    res.status(500).json({
+      message: err.message,
+    });
   }
 });
 
@@ -214,7 +229,7 @@ app.get("/api/tests", verifyToken, async (req, res) => {
     const tests = await Test.find().sort({ date: -1 });
     res.json(tests);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
