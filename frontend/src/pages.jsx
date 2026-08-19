@@ -2431,39 +2431,49 @@ function ResultsPage({ search }) {
   const [tests, setTests] = useState([]);
   const [selectedTest, setSelectedTest] = useState("");
   const [students, setStudents] = useState([]);
+
   const role = localStorage.getItem("role");
   const isReadOnly = role === "teacher";
 
   useEffect(() => {
     loadTests();
+    loadStudents();
   }, []);
 
   const loadTests = async () => {
-  try {
-    const res = await api.get("/tests", {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
+    try {
+      const res = await api.get("/tests", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
 
-    // Sort by latest date first
-    const sortedTests = [...res.data].sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
-    );
+      // Sort by latest date first
+      const sortedTests = [...res.data].sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
 
-    setTests(sortedTests);
+      setTests(sortedTests);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load tests");
+    }
+  };
 
-  } catch (err) {
-    alert("Failed to load tests");
-  }
-};
+  const loadStudents = async () => {
+    try {
+      const res = await api.get("/students", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
 
-    setStudents(res.data);
-
-  } catch (err) {
-    alert("Failed to load students");
-  }
-};
+      setStudents(res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load students");
+    }
+  };
 
 const saveResults = async () => {
   try {
