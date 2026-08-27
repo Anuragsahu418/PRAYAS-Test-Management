@@ -140,9 +140,10 @@ export function Login() {
   const login = async () => {
     try {
       const res = await api.post("/login", {
-        username,
-        password,
-      });
+  username,
+  password,
+  role, // "student", "admin", or "teacher"
+});
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);

@@ -48,62 +48,87 @@ app.get("/api/create-admins", async (req, res) => {
 });
 
 app.post("/api/login", async (req, res) => {
-  const { username, password } = req.body;
+  try {
+    const { username, password, role } = req.body;
 
-  // Check Admin
-  let user = await Admin.findOne({ username });
+    if (role === "admin" || role === "teacher") {
+      const user = await Admin.findOne({ username });
 
-  if (user) {
-    const match = await bcrypt.compare(password, user.password);
+      if (!user) {
+        return res.status(404).json({
+          message: "Admin not found",
+        });
+      }
 
-    if (!match)
-      return res.status(401).json({ message: "Invalid Password" });
+      const match = await bcrypt.compare(password, user.password);
 
-    const role = user.username === "Teacher" ? "teacher" : "admin";
+      if (!match) {
+        return res.status(401).json({
+          message: "Invalid Password",
+        });
+      }
 
-    const token = jwt.sign(
-      { id: user._id, role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+      const userRole =
+        user.username === "Teacher" ? "teacher" : "admin";
 
-    return res.json({
-      role,
-      token,
+      const token = jwt.sign(
+        { id: user._id, role: userRole },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      return res.json({
+        role: userRole,
+        token,
+      });
+    }
+
+    if (role === "student") {
+      const user = await Student.findOne({
+        studentCode: username,
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          message: "Student not found",
+        });
+      }
+
+      const match = await bcrypt.compare(password, user.password);
+
+      if (!match) {
+        return res.status(401).json({
+          message: "Invalid Password",
+        });
+      }
+
+      const token = jwt.sign(
+        { id: user._id, role: "student" },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      return res.json({
+        role: "student",
+        token,
+        student: {
+          id: user._id,
+          name: user.name,
+          rollNo: user.rollNo,
+          studentCode: user.studentCode,
+        },
+      });
+    }
+
+    return res.status(400).json({
+      message: "Role is required",
+    });
+  } catch (err) {
+    console.error("Login Error:", err);
+    return res.status(500).json({
+      message: "Internal Server Error",
     });
   }
-
-  // Check Student
-  user = await Student.findOne({ studentCode: username });
-
-  if (user) {
-    const match = await bcrypt.compare(password, user.password);
-
-    if (!match)
-      return res.status(401).json({ message: "Invalid Password" });
-
-    const token = jwt.sign(
-      { id: user._id, role: "student" },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-  return res.json({
-  role: "student",
-  token,
-
-  student: {
-    id: user._id,
-    name: user.name,
-    rollNo: user.rollNo,
-    studentCode: user.studentCode,
-  },
-});
-  }
-
-  res.status(404).json({
-    message: "User Not Found",
-  });
 });
 
 app.post("/api/students", verifyToken, isAdmin, async (req, res) => {
