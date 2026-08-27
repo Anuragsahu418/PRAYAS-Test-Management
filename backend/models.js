@@ -122,10 +122,15 @@ const QuizSchema = new mongoose.Schema(
     },
 
     status: {
-      type: String,
-      enum: ["draft", "published"],
-      default: "draft",
-    },
+  type: String,
+  enum: ["draft", "published"],
+  default: "draft",
+},
+
+publishedAt: {
+  type: Date,
+  default: null,
+},
   },
   {
     timestamps: true,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "./api";
-import { User, Lock, Eye, EyeOff, Users, FileText, TrendingUp, Trophy, BarChart4, LayoutDashboard, ClipboardList, LogOut,GraduationCap} from "lucide-react";
+import { User, Lock, Eye, EyeOff, Users, FileText, TrendingUp, Trophy, BarChart4, LayoutDashboard, ClipboardList, LogOut,GraduationCap,Calendar} from "lucide-react";
 
 // ================= LOGIN =================
 
@@ -137,11 +137,6 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Independence Day theme ONLY on 15 August
-  const today = new Date();
-  const isIndependenceDay =
-    today.getDate() === 15 && today.getMonth() === 7;
-
   const login = async () => {
     try {
       const res = await api.post("/login", {
@@ -170,138 +165,220 @@ export function Login() {
     }
   };
 
+  /*
+   * Cyberpunk background particles.
+   * These are generated once so React does not recreate them
+   * every time the component renders.
+   */
+
+  const cyberParticles = Array.from({ length: 55 }, (_, i) => ({
+    id: i,
+    left: `${(i * 37) % 100}%`,
+    top: `${(i * 61) % 100}%`,
+    size: i % 9 === 0 ? 4 : i % 4 === 0 ? 3 : 2,
+    color:
+      i % 3 === 0
+        ? "cyan"
+        : i % 3 === 1
+        ? "violet"
+        : "pink",
+    duration: `${5 + (i % 8)}s`,
+    delay: `${-(i % 10)}s`,
+  }));
+
+  /*
+   * Falling cyber snow / digital particles.
+   */
+
+  const cyberSnow = Array.from({ length: 42 }, (_, i) => ({
+    id: i,
+    left: `${(i * 29) % 100}%`,
+    size: i % 7 === 0 ? 4 : i % 3 === 0 ? 3 : 2,
+    duration: `${7 + (i % 9)}s`,
+    delay: `${-(i % 12)}s`,
+    drift: `${-80 + ((i * 47) % 160)}px`,
+    color:
+      i % 4 === 0
+        ? "cyan"
+        : i % 4 === 1
+        ? "violet"
+        : i % 4 === 2
+        ? "pink"
+        : "blue",
+  }));
+
   return (
-    <div
-      className={`relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 ${
-        isIndependenceDay
-          ? "bg-[#020806]"
-          : "bg-[#0b1020]"
-      }`}
-    >
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#081321] px-4 py-8">
+
       {/* =========================================================
-          INDEPENDENCE DAY BACKGROUND
+          DEEP CYBERPUNK NIGHT SKY
+         ========================================================= */}
+
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,#07111f_0%,#0a1627_35%,#11152c_65%,#07111f_100%)]" />
+
+      {/* =========================================================
+          MOVING NEBULA
+         ========================================================= */}
+
+      <div className="absolute -left-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-cyan-400/[0.15] blur-[130px] animate-[nebulaOne_12s_ease-in-out_infinite]" />
+
+      <div className="absolute -right-40 -top-20 h-[32rem] w-[32rem] rounded-full bg-violet-500/[0.14] blur-[140px] animate-[nebulaTwo_15s_ease-in-out_infinite]" />
+
+      <div className="absolute -bottom-44 left-[5%] h-[32rem] w-[32rem] rounded-full bg-blue-500/[0.13] blur-[145px] animate-[nebulaThree_17s_ease-in-out_infinite]" />
+
+      <div className="absolute -bottom-44 right-[4%] h-[30rem] w-[30rem] rounded-full bg-fuchsia-500/[0.11] blur-[145px] animate-[nebulaFour_14s_ease-in-out_infinite]" />
+
+      {/* =========================================================
+          CENTER AURA
+         ========================================================= */}
+
+      <div className="absolute left-1/2 top-1/2 h-[38rem] w-[38rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-400/[0.045] blur-[130px] animate-pulse" />
+
+      {/* =========================================================
+          CYBER GRID
          ========================================================= */}
 
       <div
-        className={`absolute inset-0 ${
-          isIndependenceDay
-            ? "bg-[radial-gradient(circle_at_0%_50%,rgba(255,153,51,0.20),transparent_32%),radial-gradient(circle_at_100%_50%,rgba(19,136,8,0.20),transparent_32%),radial-gradient(circle_at_50%_100%,rgba(255,255,255,0.035),transparent_35%),linear-gradient(135deg,#050a07_0%,#07100b_45%,#020705_100%)]"
-            : "bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.28),transparent_32%),radial-gradient(circle_at_top_right,rgba(217,70,239,0.26),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,85,247,0.22),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.22),transparent_32%),linear-gradient(135deg,#0f172a_0%,#111827_35%,#1e1b4b_70%,#0f172a_100%)]"
-        }`}
+        className="absolute inset-[-100px] opacity-30 animate-[gridMove_22s_linear_infinite]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(34,211,238,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(139,92,246,0.06) 1px, transparent 1px)
+          `,
+          backgroundSize: "45px 45px",
+        }}
       />
 
       {/* =========================================================
-          PREMIUM GRID
+          STARFIELD
+         ========================================================= */}
+
+      <div className="pointer-events-none absolute inset-0">
+
+        {cyberParticles.map((particle) => (
+          <span
+            key={particle.id}
+            className={`absolute rounded-full animate-[starFloat_var(--duration)_ease-in-out_var(--delay)_infinite] ${
+              particle.color === "cyan"
+                ? "bg-cyan-300 shadow-[0_0_12px_3px_rgba(34,211,238,0.75)]"
+                : particle.color === "violet"
+                ? "bg-violet-300 shadow-[0_0_12px_3px_rgba(139,92,246,0.75)]"
+                : "bg-fuchsia-300 shadow-[0_0_12px_3px_rgba(217,70,239,0.70)]"
+            }`}
+            style={{
+              left: particle.left,
+              top: particle.top,
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              "--duration": particle.duration,
+              "--delay": particle.delay,
+            }}
+          />
+        ))}
+
+      </div>
+
+      {/* =========================================================
+          CYBER SNOW
+         ========================================================= */}
+
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+
+        {cyberSnow.map((flake) => (
+          <span
+            key={flake.id}
+            className={`absolute top-[-20px] rounded-full animate-[snowfall_var(--duration)_linear_var(--delay)_infinite] ${
+              flake.color === "cyan"
+                ? "bg-cyan-200 shadow-[0_0_10px_3px_rgba(34,211,238,0.7)]"
+                : flake.color === "violet"
+                ? "bg-violet-200 shadow-[0_0_10px_3px_rgba(139,92,246,0.7)]"
+                : flake.color === "pink"
+                ? "bg-pink-200 shadow-[0_0_10px_3px_rgba(236,72,153,0.7)]"
+                : "bg-blue-200 shadow-[0_0_10px_3px_rgba(59,130,246,0.7)]"
+            }`}
+            style={{
+              left: flake.left,
+              width: `${flake.size}px`,
+              height: `${flake.size}px`,
+              "--duration": flake.duration,
+              "--delay": flake.delay,
+              "--drift": flake.drift,
+            }}
+          />
+        ))}
+
+      </div>
+
+      {/* =========================================================
+          DIAGONAL DIGITAL LIGHT
+         ========================================================= */}
+
+      <div className="absolute left-[-30%] top-[-30%] h-[160%] w-[18%] rotate-[20deg] bg-gradient-to-r from-transparent via-cyan-300/[0.035] to-transparent blur-2xl animate-[lightSweep_14s_linear_infinite]" />
+
+      <div className="absolute right-[-30%] top-[-30%] h-[160%] w-[15%] rotate-[-20deg] bg-gradient-to-r from-transparent via-fuchsia-300/[0.03] to-transparent blur-2xl animate-[lightSweepReverse_18s_linear_infinite]" />
+
+      {/* =========================================================
+          SCANLINES
          ========================================================= */}
 
       <div
-        className={`absolute inset-0 ${
-          isIndependenceDay
-            ? "bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:42px_42px]"
-            : "bg-[linear-gradient(rgba(34,211,238,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(217,70,239,0.08)_1px,transparent_1px)] bg-[size:36px_36px] opacity-70"
-        }`}
+        className="pointer-events-none absolute inset-0 opacity-[0.025]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to bottom, rgba(255,255,255,0.45) 1px, transparent 1px)",
+          backgroundSize: "100% 6px",
+        }}
       />
 
       {/* =========================================================
-          TRICOLOR LIGHT BARS
-         ========================================================= */}
-
-      {isIndependenceDay && (
-        <>
-          <div className="absolute left-0 top-0 h-full w-[20%] bg-gradient-to-r from-orange-500/[0.06] to-transparent blur-3xl" />
-
-          <div className="absolute right-0 top-0 h-full w-[20%] bg-gradient-to-l from-green-600/[0.06] to-transparent blur-3xl" />
-
-          <div className="absolute left-1/2 top-0 h-[1px] w-[55%] -translate-x-1/2 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-
-          <div className="absolute bottom-0 left-1/2 h-[1px] w-[55%] -translate-x-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        </>
-      )}
-
-      {/* =========================================================
-          AMBIENT GLOW
-         ========================================================= */}
-
-      <div
-        className={`absolute -left-40 top-1/4 h-[32rem] w-[32rem] rounded-full blur-[160px] animate-pulse ${
-          isIndependenceDay
-            ? "bg-orange-500/20"
-            : "bg-cyan-400/40"
-        }`}
-      />
-
-      <div
-        className={`absolute -right-40 top-1/3 h-[32rem] w-[32rem] rounded-full blur-[160px] animate-pulse ${
-          isIndependenceDay
-            ? "bg-green-600/20"
-            : "bg-fuchsia-500/40"
-        }`}
-      />
-
-      <div
-        className={`absolute bottom-[-12rem] left-1/2 h-[30rem] w-[45rem] -translate-x-1/2 rounded-full blur-[160px] ${
-          isIndependenceDay
-            ? "bg-white/[0.025]"
-            : "bg-violet-500/20"
-        }`}
-      />
-
-      {/* =========================================================
-          DECORATIVE PARTICLES
-         ========================================================= */}
-
-      {isIndependenceDay && (
-        <>
-          <div className="absolute left-[18%] top-[22%] h-1 w-1 rounded-full bg-orange-400 shadow-[0_0_12px_4px_rgba(255,153,51,0.5)] animate-pulse" />
-
-          <div className="absolute right-[18%] top-[28%] h-1 w-1 rounded-full bg-green-400 shadow-[0_0_12px_4px_rgba(19,136,8,0.5)] animate-pulse" />
-
-          <div className="absolute left-[12%] bottom-[25%] h-1 w-1 rounded-full bg-white/80 shadow-[0_0_10px_3px_rgba(255,255,255,0.3)] animate-pulse" />
-
-          <div className="absolute right-[13%] bottom-[20%] h-1 w-1 rounded-full bg-green-400 shadow-[0_0_12px_4px_rgba(19,136,8,0.4)] animate-pulse" />
-        </>
-      )}
-
-      {/* =========================================================
-          LOGIN CONTAINER
+          LOGIN AREA
          ========================================================= */}
 
       <div className="relative z-10 w-full max-w-sm sm:max-w-md">
 
-        {/* Tricolor outer glow */}
-        {isIndependenceDay && (
-          <div className="absolute -inset-[2px] rounded-[2rem] bg-gradient-to-b from-orange-500/50 via-white/20 to-green-600/50 opacity-70 blur-[3px]" />
-        )}
+        {/* =======================================================
+            CARD OUTER AURA
+           ======================================================= */}
 
-        <div
-          className={`relative overflow-hidden rounded-[2rem] p-6 sm:p-8 backdrop-blur-2xl ${
-            isIndependenceDay
-              ? "border border-white/[0.16] bg-[#07100b]/85 shadow-[0_20px_80px_rgba(0,0,0,0.55),0_0_45px_rgba(255,153,51,0.10),0_0_80px_rgba(19,136,8,0.10)]"
-              : "border border-cyan-400/30 bg-slate-900/45 shadow-[0_0_30px_rgba(34,211,238,0.28),0_0_90px_rgba(168,85,247,0.22),0_0_120px_rgba(217,70,239,0.16),inset_0_1px_0_rgba(255,255,255,0.08)]"
-          }`}
-        >
+        <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-r from-cyan-400/[0.13] via-violet-500/[0.09] to-fuchsia-500/[0.12] blur-2xl" />
+
+        {/* =======================================================
+            ANIMATED BORDER
+           ======================================================= */}
+
+        <div className="absolute -inset-[2px] overflow-hidden rounded-[2rem]">
+
+          <div className="absolute inset-[-100%] animate-[spin_7s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,transparent_220deg,#22d3ee_255deg,#8b5cf6_290deg,#ec4899_320deg,transparent_355deg)]" />
+
+        </div>
+
+        {/* =======================================================
+            LOGIN CARD
+           ======================================================= */}
+
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.13] bg-[#0d1a2b]/[0.94] p-6 shadow-[0_25px_100px_rgba(0,0,0,0.45),0_0_35px_rgba(34,211,238,0.13),0_0_70px_rgba(139,92,246,0.10)] backdrop-blur-2xl sm:p-8">
+
+          {/* Card inner glow */}
+
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.10),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(217,70,239,0.08),transparent_35%)]" />
 
           {/* =====================================================
-              TOP TRICOLOR LINE
+              CORNER DETAILS
              ===================================================== */}
 
-          {isIndependenceDay && (
-            <div className="absolute left-0 right-0 top-0 h-[3px] bg-gradient-to-r from-orange-500 via-white to-green-600 shadow-[0_0_15px_rgba(255,255,255,0.18)]" />
-          )}
+          <div className="absolute left-5 top-5 h-6 w-6 border-l border-t border-cyan-300/50" />
+
+          <div className="absolute right-5 top-5 h-6 w-6 border-r border-t border-violet-300/50" />
+
+          <div className="absolute bottom-5 left-5 h-6 w-6 border-b border-l border-violet-300/40" />
+
+          <div className="absolute bottom-5 right-5 h-6 w-6 border-b border-r border-cyan-300/50" />
 
           {/* =====================================================
-              SUBTLE ASHOKA CHAKRA
+              TOP LIGHT
              ===================================================== */}
 
-          {isIndependenceDay && (
-            <div className="pointer-events-none absolute -right-20 -top-20 opacity-[0.035]">
-              <div className="flex h-56 w-56 items-center justify-center rounded-full border-[14px] border-white">
-                <div className="flex h-36 w-36 items-center justify-center rounded-full border-4 border-white">
-                  <span className="text-7xl text-white">☸</span>
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="absolute left-[12%] right-[12%] top-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent shadow-[0_0_14px_rgba(34,211,238,0.9)]" />
 
           {/* =====================================================
               LOGO
@@ -309,25 +386,21 @@ export function Login() {
 
           <div className="relative mb-6 flex justify-center">
 
-            {isIndependenceDay && (
-              <div className="absolute h-24 w-24 rounded-full bg-gradient-to-r from-orange-500/20 via-white/10 to-green-500/20 blur-xl" />
-            )}
+            <div className="absolute h-28 w-28 rounded-full bg-cyan-400/[0.10] blur-2xl animate-pulse" />
 
-            <div
-              className={`relative flex h-[88px] w-[88px] items-center justify-center rounded-full backdrop-blur-xl ${
-                isIndependenceDay
-                  ? "border border-white/25 bg-white/[0.045] shadow-[0_0_30px_rgba(255,153,51,0.15),0_0_60px_rgba(19,136,8,0.12)]"
-                  : "border border-cyan-400/40 bg-cyan-500/15 shadow-[0_0_30px_rgba(34,211,238,0.45),0_0_60px_rgba(217,70,239,0.22)]"
-              }`}
-            >
+            <div className="absolute h-24 w-24 rounded-full bg-violet-500/[0.09] blur-xl" />
+
+            <div className="relative flex h-[88px] w-[88px] items-center justify-center rounded-full border border-cyan-300/40 bg-[#0b1b2e]/95 shadow-[0_0_25px_rgba(34,211,238,0.30),0_0_55px_rgba(34,211,238,0.12),inset_0_0_25px_rgba(34,211,238,0.07)]">
+
+              <div className="absolute inset-[6px] rounded-full border border-violet-400/20" />
+
+              <div className="absolute inset-[12px] rounded-full border border-cyan-400/10" />
+
               <GraduationCap
                 size={42}
-                className={
-                  isIndependenceDay
-                    ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.65)]"
-                    : "text-cyan-300"
-                }
+                className="relative text-cyan-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.9)]"
               />
+
             </div>
           </div>
 
@@ -335,40 +408,20 @@ export function Login() {
               TITLE
              ===================================================== */}
 
-          <h1
-            className={`relative text-center text-2xl sm:text-3xl font-black uppercase tracking-[0.20em] leading-[1.25] break-words bg-clip-text text-transparent ${
-              isIndependenceDay
-                ? "bg-gradient-to-r from-orange-400 via-white to-green-400 drop-shadow-[0_0_18px_rgba(255,255,255,0.18)]"
-                : "bg-gradient-to-r from-cyan-300 via-violet-300 to-pink-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.9)]"
-            }`}
-          >
+          <h1 className="relative text-center text-2xl font-black uppercase tracking-[0.18em] leading-[1.25] break-words bg-gradient-to-r from-cyan-200 via-violet-200 to-fuchsia-300 bg-clip-text text-transparent drop-shadow-[0_0_18px_rgba(34,211,238,0.45)] sm:text-3xl">
+
             PRAYAS CHARITABLE TRUST
+
           </h1>
 
           {/* =====================================================
-              INDEPENDENCE DAY MESSAGE
+              SUBTITLE
              ===================================================== */}
 
-          {isIndependenceDay && (
-            <div className="mt-4 flex items-center justify-center gap-3">
-              <span className="h-px w-8 bg-gradient-to-r from-transparent to-orange-400/70" />
+          <p className="relative mt-4 text-center text-sm text-slate-300 sm:text-base">
 
-              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.22em] text-white/85">
-                🇮🇳 Happy Independence Day
-              </p>
-
-              <span className="h-px w-8 bg-gradient-to-l from-transparent to-green-400/70" />
-            </div>
-          )}
-
-          <p
-            className={`mt-4 text-center text-sm sm:text-base ${
-              isIndependenceDay
-                ? "text-white/60"
-                : "text-slate-300"
-            }`}
-          >
             WELCOME TO PRAYAS STUDENT PORTAL CLASS 10th
+
           </p>
 
           {/* =====================================================
@@ -377,26 +430,24 @@ export function Login() {
 
           <div className="relative mt-8 mb-5">
 
-            <User
-              size={20}
-              className={`absolute left-4 top-1/2 -translate-y-1/2 ${
-                isIndependenceDay
-                  ? "text-orange-400"
-                  : "text-cyan-300/90"
-              }`}
-            />
+            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-cyan-400/40 via-blue-400/20 to-violet-500/30 opacity-0 blur-sm transition-all duration-300 focus-within:opacity-100" />
 
-            <input
-              type="text"
-              placeholder="Username / Student Code"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className={`w-full rounded-2xl py-3.5 pl-12 pr-4 outline-none transition-all duration-300 ${
-                isIndependenceDay
-                  ? "border border-white/[0.12] bg-black/30 text-white placeholder:text-white/35 hover:border-orange-400/30 focus:border-orange-400/60 focus:bg-black/40 focus:ring-2 focus:ring-orange-400/10 focus:shadow-[0_0_25px_rgba(255,153,51,0.15)]"
-                  : "border border-cyan-400/25 bg-slate-900/55 text-white placeholder:text-slate-400 focus:border-cyan-300 focus:bg-slate-900/70 focus:ring-2 focus:ring-cyan-400/25 focus:shadow-[0_0_30px_rgba(34,211,238,0.28)]"
-              }`}
-            />
+            <div className="relative">
+
+              <User
+                size={20}
+                className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-cyan-300 drop-shadow-[0_0_7px_rgba(34,211,238,0.9)]"
+              />
+
+              <input
+                type="text"
+                placeholder="Username / Student Code"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full rounded-2xl border border-cyan-300/20 bg-[#081524]/90 py-3.5 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none transition-all duration-300 hover:border-cyan-300/40 focus:border-cyan-300/60 focus:bg-[#0a1929] focus:ring-2 focus:ring-cyan-400/[0.10] focus:shadow-[0_0_25px_rgba(34,211,238,0.18),inset_0_0_20px_rgba(34,211,238,0.04)]"
+              />
+
+            </div>
           </div>
 
           {/* =====================================================
@@ -405,91 +456,222 @@ export function Login() {
 
           <div className="relative mb-6">
 
-            <Lock
-              size={20}
-              className={`absolute left-4 top-1/2 -translate-y-1/2 ${
-                isIndependenceDay
-                  ? "text-green-400"
-                  : "text-cyan-300"
-              }`}
-            />
+            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-violet-400/30 to-fuchsia-500/30 opacity-0 blur-sm transition-all duration-300 focus-within:opacity-100" />
 
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={`w-full rounded-2xl py-3.5 pl-12 pr-12 outline-none transition-all duration-300 ${
-                isIndependenceDay
-                  ? "border border-white/[0.12] bg-black/30 text-white placeholder:text-white/35 hover:border-green-400/30 focus:border-green-400/60 focus:bg-black/40 focus:ring-2 focus:ring-green-400/10 focus:shadow-[0_0_25px_rgba(19,136,8,0.15)]"
-                  : "border border-cyan-400/20 bg-slate-900/70 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 shadow-[0_0_15px_rgba(34,211,238,0.15)]"
-              }`}
-            />
+            <div className="relative">
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowPassword((prev) => !prev);
-              }}
-              className={`absolute right-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
-                isIndependenceDay
-                  ? "text-white/40 hover:text-white"
-                  : "text-slate-400 hover:text-cyan-300"
-              }`}
-            >
-              {showPassword ? (
-                <EyeOff size={20} />
-              ) : (
-                <Eye size={20} />
-              )}
-            </button>
+              <Lock
+                size={20}
+                className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-violet-300 drop-shadow-[0_0_7px_rgba(139,92,246,0.9)]"
+              />
+
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-2xl border border-violet-300/20 bg-[#081524]/90 py-3.5 pl-12 pr-12 text-white placeholder:text-slate-500 outline-none transition-all duration-300 hover:border-violet-300/40 focus:border-violet-300/60 focus:bg-[#0a1929] focus:ring-2 focus:ring-violet-400/[0.10] focus:shadow-[0_0_25px_rgba(139,92,246,0.18),inset_0_0_20px_rgba(139,92,246,0.04)]"
+              />
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowPassword((prev) => !prev);
+                }}
+                className="absolute right-4 top-1/2 z-10 -translate-y-1/2 text-slate-400 transition-all duration-300 hover:text-cyan-300 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.9)]"
+              >
+                {showPassword ? (
+                  <EyeOff size={20} />
+                ) : (
+                  <Eye size={20} />
+                )}
+              </button>
+
+            </div>
           </div>
 
           {/* =====================================================
-              PREMIUM TRICOLOR LOGIN BUTTON
+              LOGIN BUTTON
              ===================================================== */}
 
           <button
             onClick={login}
-            className={`group relative w-full overflow-hidden rounded-2xl py-3.5 text-sm sm:text-base font-black uppercase tracking-[0.18em] transition-all duration-300 hover:scale-[1.015] active:scale-[0.99] ${
-              isIndependenceDay
-                ? "border border-white/20 bg-gradient-to-r from-orange-500 via-white via-[52%] to-green-600 text-black shadow-[0_0_30px_rgba(255,153,51,0.22),0_0_50px_rgba(19,136,8,0.16)] hover:shadow-[0_0_40px_rgba(255,153,51,0.30),0_0_70px_rgba(19,136,8,0.25)]"
-                : "border border-cyan-400/40 bg-gradient-to-r from-cyan-400 via-violet-500 to-fuchsia-500 text-white shadow-[0_0_30px_rgba(34,211,238,0.45),0_0_70px_rgba(217,70,239,0.28)] hover:border-cyan-300/60 hover:shadow-[0_0_40px_rgba(34,211,238,0.6),0_0_90px_rgba(217,70,239,0.4)]"
-            }`}
+            className="group relative w-full overflow-hidden rounded-2xl border border-cyan-300/40 bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-600 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-white shadow-[0_0_25px_rgba(34,211,238,0.35),0_0_55px_rgba(99,102,241,0.18)] transition-all duration-300 hover:scale-[1.015] hover:border-cyan-200/70 hover:shadow-[0_0_35px_rgba(34,211,238,0.55),0_0_70px_rgba(139,92,246,0.30)] active:scale-[0.99] sm:text-base"
           >
+
             {/* Shine */}
-            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/35 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+
+            <div className="absolute inset-y-0 left-[-100%] w-1/2 skew-x-[-20deg] bg-white/25 blur-md transition-all duration-700 group-hover:left-[130%]" />
 
             {/* Hover glow */}
-            <div
-              className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
-                isIndependenceDay
-                  ? "bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.35),transparent_65%)]"
-                  : "bg-[radial-gradient(circle_at_left,rgba(255,255,255,0.28),transparent_60%)]"
-              }`}
-            />
+
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.25),transparent_65%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
             <span className="relative flex items-center justify-center gap-3">
-              <span className="text-base">⚡</span>
-              <span>Login</span>
+
+              <span className="text-base drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]">
+                ⚡
+              </span>
+
+              <span>
+                Login
+              </span>
+
             </span>
+
           </button>
 
           {/* =====================================================
               BOTTOM DECORATION
              ===================================================== */}
 
-          {isIndependenceDay && (
-            <div className="mt-6 flex items-center justify-center gap-2">
-              <span className="h-[2px] w-10 rounded-full bg-orange-500/60" />
-              <span className="h-[2px] w-10 rounded-full bg-white/70" />
-              <span className="h-[2px] w-10 rounded-full bg-green-500/60" />
-            </div>
-          )}
+          <div className="mt-6 flex items-center justify-center gap-2">
+
+            <span className="h-[2px] w-10 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.9)]" />
+
+            <span className="h-[2px] w-10 rounded-full bg-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.9)]" />
+
+            <span className="h-[2px] w-10 rounded-full bg-fuchsia-400 shadow-[0_0_10px_rgba(217,70,239,0.8)]" />
+
+          </div>
 
         </div>
       </div>
+
+      {/* =========================================================
+          ANIMATION DEFINITIONS
+         ========================================================= */}
+
+      <style>
+        {`
+          @keyframes gridMove {
+            0% {
+              transform: translate3d(0, 0, 0);
+            }
+
+            100% {
+              transform: translate3d(45px, 45px, 0);
+            }
+          }
+
+          @keyframes starFloat {
+            0%, 100% {
+              opacity: 0.15;
+              transform: scale(0.7) translateY(0);
+            }
+
+            50% {
+              opacity: 1;
+              transform: scale(1.5) translateY(-8px);
+            }
+          }
+
+          @keyframes snowfall {
+            0% {
+              transform: translate3d(0, -30px, 0) rotate(0deg);
+              opacity: 0;
+            }
+
+            10% {
+              opacity: 0.9;
+            }
+
+            50% {
+              transform: translate3d(
+                var(--drift),
+                50vh,
+                0
+              ) rotate(180deg);
+              opacity: 0.65;
+            }
+
+            90% {
+              opacity: 0.8;
+            }
+
+            100% {
+              transform: translate3d(
+                calc(var(--drift) * -0.4),
+                110vh,
+                0
+              ) rotate(360deg);
+              opacity: 0;
+            }
+          }
+
+          @keyframes nebulaOne {
+            0%, 100% {
+              transform: translate3d(0, 0, 0) scale(1);
+            }
+
+            50% {
+              transform: translate3d(80px, 60px, 0) scale(1.1);
+            }
+          }
+
+          @keyframes nebulaTwo {
+            0%, 100% {
+              transform: translate3d(0, 0, 0) scale(1);
+            }
+
+            50% {
+              transform: translate3d(-70px, 70px, 0) scale(1.08);
+            }
+          }
+
+          @keyframes nebulaThree {
+            0%, 100% {
+              transform: translate3d(0, 0, 0);
+            }
+
+            50% {
+              transform: translate3d(90px, -60px, 0);
+            }
+          }
+
+          @keyframes nebulaFour {
+            0%, 100% {
+              transform: translate3d(0, 0, 0);
+            }
+
+            50% {
+              transform: translate3d(-80px, -60px, 0);
+            }
+          }
+
+          @keyframes lightSweep {
+            0% {
+              transform: translateX(-120%) rotate(20deg);
+            }
+
+            100% {
+              transform: translateX(650%) rotate(20deg);
+            }
+          }
+
+          @keyframes lightSweepReverse {
+            0% {
+              transform: translateX(120%) rotate(-20deg);
+            }
+
+            100% {
+              transform: translateX(-650%) rotate(-20deg);
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              scroll-behavior: auto !important;
+            }
+          }
+        `}
+      </style>
+
     </div>
   );
 }
@@ -512,6 +694,7 @@ const menus = role === "teacher"
       { id: "dashboard", title: "Dashboard", icon: <LayoutDashboard size={20} /> },
       { id: "students", title: "Students", icon: <Users size={20} /> },
       { id: "tests", title: "Tests", icon: <ClipboardList size={20} /> },
+      { id: "quizzes", title: "Quizzes", icon: <ClipboardList size={20} />},
       { id: "results", title: "Results", icon: <FileText size={20} /> },
     ];
 
@@ -677,9 +860,10 @@ const menus = role === "teacher"
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-visible">
 
           {page === "dashboard" && <DashboardPage />}
-{page === "students" && <StudentsPage search={search} />}
-{role !== "teacher" && page === "tests" && <TestsPage search={search} />}
-{page === "results" && <ResultsPage search={search} />}
+          {page === "students" && <StudentsPage search={search} />}
+          {role !== "teacher" && page === "tests" && <TestsPage search={search} />}
+          {role !== "teacher" && page === "quizzes" && <QuizzesPage />}
+          {page === "results" && <ResultsPage search={search} />}
 
     </main>
     </div>
@@ -965,10 +1149,11 @@ export function StudentDashboard() {
 return (
    <div className="min-h-screen bg-[#02030a] text-white flex flex-col lg:flex-row overflow-y-auto touch-pan-y">
 
-<div className="rounded-2xl border border-cyan-400/40 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 px-4 sm:px-5 py-4 shadow-[0_0_25px_rgba(34,211,238,0.25)]">
+<div className="p-4 lg:p-6 flex flex-col h-full">
+  {/* Everything currently inside the sidebar */}
 
     {/* Sidebar */}
-    <div className="relative z-10 w-full lg:w-72 shrink-0 bg-slate-950/80 backdrop-blur-3xl border-b lg:border-b-0 lg:border-r border-cyan-400/20 shadow-[0_0_60px_rgba(34,211,238,0.12)] p-4 lg:p-6 flex flex-col">
+    <aside className="relative z-10 w-full lg:w-64 shrink-0 bg-slate-950/80 backdrop-blur-3xl border-b lg:border-b-0 lg:border-r border-cyan-400/20 shadow-[0_0_60px_rgba(34,211,238,0.12)] flex flex-col">
       {/* Logo */}
       
 
@@ -1045,7 +1230,7 @@ return (
     Student Name
   </p>
 
-  <p className="mt-1 text-xl sm:text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] break-words leading-tight">
+  <p className="mt-1 text-lg sm:text-xl lg:text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] break-words leading-tight">
     {localStorage.getItem("studentName")}
   </p>
 
@@ -1058,7 +1243,7 @@ return (
         Roll Number
       </p>
 
-      <p className="mt-1 text-xl sm:text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] break-all">
+      <p className="mt-1 text-lg sm:text-xl lg:text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] break-words">
         {localStorage.getItem("rollNo")}
       </p>
 
@@ -1071,7 +1256,7 @@ return (
         Student Code
       </p>
 
-      <p className="mt-1 text-xl sm:text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] break-all">
+      <p className="mt-1 text-lg sm:text-xl lg:text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] break-words">
         {localStorage.getItem("studentCode")}
       </p>
 
@@ -1083,12 +1268,13 @@ return (
       {/* Navigation */}
       <ul className="space-y-3 flex-1">
         {
-          ["dashboard", "results", "performance"].map((item) => {
+          [ "dashboard","quizzes","results","performance"].map((item) => {
             const icons = {
-              dashboard: "📊",
-              results: "📄",
-              performance: "📈"
-            };
+            dashboard: "🏠",
+            quizzes: "🧠",
+            results: "📊",
+            performance: "📈",
+          };
 
             return (
               <li
@@ -1126,31 +1312,33 @@ return (
           <span>Logout</span>
         </div>
       </button>
+    </aside>
     </div>
 
     {/* Main */}
-    <div className="relative flex-1 min-h-screen overflow-y-auto overflow-x-hidden bg-[#02030a] p-4 sm:p-6 lg:p-10 touch-pan-y">
+    <main className="relative flex-1 overflow-y-auto bg-[#02030a] p-4 sm:p-6 lg:p-8 touch-pan-y">
       {/* Cyberpunk Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-      <div className="relative z-10 w-full overflow-x-hidden rounded-[1.5rem] sm:rounded-[2rem] border border-cyan-400/10 bg-slate-950/45 p-4 sm:p-6 lg:p-8 shadow-[0_0_60px_rgba(0,0,0,0.45)] backdrop-blur-2xl touch-pan-y">
+      <div className="relative z-10 w-full overflow-x-hidden rounded-[1.5rem] sm:rounded-[2rem] border border-cyan-400/10 bg-slate-950/45 p-4 sm:p-6 lg:p-8 shadow-[0_0_60px_rgba(0,0,0,0.45)] touch-pan-y">
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
 
 
         </div>
 
         {page === "dashboard" && <StudentHome />}
+        {page === "quizzes" && <StudentQuizHome />}
         {page === "results" && <StudentResults />}
         {page === "performance" && <StudentPerformance />}
+        
       </div>
 
       {/* Neon Glow Effects */}
       <div className="pointer-events-none absolute -top-40 -left-40 h-[30rem] w-[30rem] rounded-full bg-fuchsia-500/20 blur-[180px] animate-pulse" />
       <div className="pointer-events-none absolute top-1/3 -right-32 h-[26rem] w-[26rem] rounded-full bg-cyan-500/20 blur-[170px] animate-pulse" />
       <div className="pointer-events-none absolute bottom-[-8rem] left-1/3 h-[22rem] w-[22rem] rounded-full bg-violet-500/20 blur-[150px] animate-pulse" />
+    </main>
     </div>
-    </div>
-  </div>
 );
 }
 
@@ -1370,6 +1558,582 @@ const highestMarks =
   );
 }
 
+function StudentQuizHome() {
+const [quizzes, setQuizzes] = useState([]);
+const [activeQuiz, setActiveQuiz] = useState(null);
+const [questions, setQuestions] = useState([]);
+const [answers, setAnswers] = useState({});
+const [timeLeft, setTimeLeft] = useState(0);
+const [currentQuestion, setCurrentQuestion] = useState(0);
+const [attemptId, setAttemptId] = useState(null);
+const [result, setResult] = useState(null);
+const [submitting, setSubmitting] = useState(false);
+
+useEffect(() => {
+  if (!activeQuiz) return;
+
+  // Push a new history state
+  window.history.pushState(null, "", window.location.href);
+
+  const handleBack = () => {
+    window.history.pushState(null, "", window.location.href);
+    alert("You cannot leave the quiz until it is submitted.");
+  };
+
+  window.addEventListener("popstate", handleBack);
+
+  return () => {
+    window.removeEventListener("popstate", handleBack);
+  };
+}, [activeQuiz]);
+
+  useEffect(() => {
+    loadQuizzes();
+  }, []);
+
+  const loadQuizzes = async () => {
+    try {
+      const res = await api.get("/student/quizzes", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      setQuizzes(res.data);
+    } catch {
+      alert("Failed to load quizzes");
+    }
+  };
+
+const grouped = quizzes.reduce((acc, quiz) => {
+  if (!acc[quiz.subject]) acc[quiz.subject] = [];
+
+  acc[quiz.subject].push(quiz);
+
+  // Sort chapters within each subject
+  acc[quiz.subject].sort((a, b) =>
+    a.chapter.localeCompare(b.chapter, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    })
+  );
+
+  return acc;
+}, {});
+
+  const startQuiz = async (quiz) => {
+  try {
+    const res = await api.get(`/student/quizzes/${quiz._id}`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+
+    setActiveQuiz(quiz);
+    setQuestions(res.data.questions);
+    setTimeLeft(res.data.remainingTime);
+    setCurrentQuestion(0);
+    setAttemptId(res.data.attempt._id);
+
+const restoredAnswers = {};
+
+(res.data.attempt.answers || []).forEach((a, index) => {
+  restoredAnswers[index] = a.selectedAnswer;
+});
+
+setAnswers(restoredAnswers);
+  } catch {
+    alert("Failed to start quiz");
+  }
+};
+
+useEffect(() => {
+  if (!activeQuiz || timeLeft <= 0) return;
+
+  const timer = setInterval(() => {
+    setTimeLeft((prev) => {
+      if (prev <= 1) {
+        clearInterval(timer);
+        submitQuiz();
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, [activeQuiz]);
+
+const submitQuiz = async () => {
+  if (submitting) return;
+
+  setSubmitting(true);
+
+  try {
+    const res = await api.post(
+  `/student/quizzes/${activeQuiz._id}/submit`,
+  {
+    attemptId,
+    answers,
+  },
+  {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
+  }
+);
+
+    setResult(res.data);
+    setActiveQuiz(null);
+    setAttemptId(null);
+  } catch {
+    alert("Failed to submit quiz");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+
+  if (result) {
+  return (
+    <div className="min-h-screen bg-[#02030a] p-6 text-white">
+      <div className="mx-auto max-w-5xl">
+
+        <div className="rounded-[2rem] border border-cyan-400/20 bg-[#0B1220]/90 p-8 backdrop-blur-2xl shadow-[0_0_50px_rgba(34,211,238,.12)]">
+
+          <div className="text-center">
+
+            <div className="text-6xl mb-4">🏆</div>
+
+            <h1 className="text-4xl font-black bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-500 bg-clip-text text-transparent">
+              Quiz Completed
+            </h1>
+
+            <p className="mt-3 text-slate-400">
+              Here's your performance.
+            </p>
+
+          </div>
+
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+            <div className="rounded-2xl bg-cyan-500/10 p-5 text-center">
+              <p className="text-3xl font-black text-cyan-300">
+                {result.score}
+              </p>
+              <p className="text-slate-400">
+                Score
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-violet-500/10 p-5 text-center">
+              <p className="text-3xl font-black text-violet-300">
+                {result.totalMarks}
+              </p>
+              <p className="text-slate-400">
+                Total
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-pink-500/10 p-5 text-center">
+              <p className="text-3xl font-black text-pink-300">
+                {result.percentage.toFixed(1)}%
+              </p>
+              <p className="text-slate-400">
+                Percentage
+              </p>
+            </div>
+
+          </div>
+
+          <div className="mt-10 space-y-4">
+
+            {result.analysis.map((item, index) => (
+              <div
+                key={index}
+                className={`rounded-2xl border p-5 ${
+                  item.correct
+                    ? "border-emerald-400/20 bg-emerald-500/10"
+                    : "border-rose-400/20 bg-rose-500/10"
+                }`}
+              >
+
+                <div className="mb-3 flex items-center justify-between">
+
+                  <span className="font-bold">
+                    Question {index + 1}
+                  </span>
+
+                  <span>
+                    {item.correct ? "✅ Correct" : "❌ Wrong"}
+                  </span>
+
+                </div>
+
+                <p className="text-white">
+                  {item.question}
+                </p>
+
+                <p className="mt-2 text-sm text-slate-300">
+                  Marks: {item.marks}
+                </p>
+
+              </div>
+            ))}
+
+          </div>
+
+          <button
+            onClick={() => {
+              setResult(null);
+              loadQuizzes();
+            }}
+            className="mt-8 w-full rounded-2xl bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 py-4 text-lg font-bold text-white"
+          >
+            Back to Quizzes
+          </button>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+if (activeQuiz) {
+  const q = questions[currentQuestion];
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-[#02030a] text-white overflow-hidden">
+      <div className="flex h-screen">
+
+        {/* Desktop Question Palette */}
+        <div className="hidden lg:flex w-28 flex-col border-r border-cyan-400/10 bg-slate-950/80 p-4">
+          <div className="mb-4 text-center text-cyan-300 font-bold">
+            Questions
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            {questions.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentQuestion(i)}
+                className={`h-10 rounded-xl text-sm font-bold transition ${
+                  currentQuestion === i
+                    ? "bg-gradient-to-r from-cyan-400 to-violet-500 text-black"
+                    : answers[i] !== undefined
+                    ? "bg-emerald-500 text-white"
+                    : "bg-slate-800 text-slate-300"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Main */}
+        <div className="flex flex-1 flex-col overflow-hidden">
+
+          {/* Header */}
+          <div className="border-b border-cyan-400/10 bg-[#0B1220]/90 px-4 py-4 backdrop-blur-xl">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h1 className="text-2xl font-black bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-500 bg-clip-text text-transparent">
+                  {activeQuiz.quizName}
+                </h1>
+
+                <p className="text-slate-400">{activeQuiz.chapter}</p>
+              </div>
+
+              <div
+                className={`rounded-2xl border px-5 py-3 text-center ${
+                  timeLeft <= 60
+                    ? "border-red-500/40 bg-red-500/20 animate-pulse"
+                    : timeLeft <= 300
+                    ? "border-orange-400/40 bg-orange-500/15"
+                    : "border-cyan-400/30 bg-cyan-500/10"
+                }`}
+              >
+                <div className="text-xs text-slate-400">
+                  Answered {Object.keys(answers).length}/{questions.length}
+                </div>
+
+                <div className="text-2xl font-black text-rose-300">
+                  {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:
+                  {String(timeLeft % 60).padStart(2, "0")}
+                </div>
+
+                <div className="text-xs text-slate-400">Time Left</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Palette */}
+          <div className="lg:hidden border-b border-cyan-400/10 bg-[#0B1220]/70 px-4 py-3">
+            <div className="flex gap-2 overflow-x-auto">
+              {questions.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentQuestion(i)}
+                  className={`h-10 min-w-10 rounded-xl text-sm font-bold ${
+                    currentQuestion === i
+                      ? "bg-gradient-to-r from-cyan-400 to-violet-500 text-black"
+                      : answers[i] !== undefined
+                      ? "bg-emerald-500 text-white"
+                      : "bg-slate-800 text-slate-300"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Progress */}
+          <div className="border-b border-cyan-400/10 bg-[#0B1220]/60 px-6 py-3">
+            <div className="flex justify-between text-sm text-slate-400">
+              <span>Progress</span>
+              <span>{Object.keys(answers).length}/{questions.length}</span>
+            </div>
+
+            <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-cyan-400 via-violet-500 to-pink-500 transition-all"
+                style={{
+                  width: `${
+                    questions.length
+                      ? (Object.keys(answers).length / questions.length) * 100
+                      : 0
+                  }%`,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Question Area */}
+          <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-8 lg:px-12">
+            {q && (
+              <div className="mx-auto w-full max-w-5xl">
+                <div className="mb-5 flex items-center justify-between">
+                  <span className="rounded-xl bg-cyan-500/10 px-3 py-2 text-cyan-300">
+                    Question {currentQuestion + 1}/{questions.length}
+                  </span>
+
+                  <span className="rounded-xl bg-violet-500/10 px-3 py-2 text-violet-300">
+                    {q.marks} Marks
+                  </span>
+                </div>
+
+                <div className="rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 p-6 sm:p-8 shadow-[0_0_35px_rgba(34,211,238,.12)]">
+                  <h2 className="text-2xl sm:text-3xl font-bold leading-relaxed text-white">
+                    {q.questionText}
+                  </h2>
+
+                  <div className="mt-8 space-y-4">
+                    {q.options.map((option, i) => {
+                      const selected =
+                        q.type === "MCQ"
+                          ? answers[currentQuestion] === i
+                          : (answers[currentQuestion] || []).includes(i);
+
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            if (q.type === "MCQ") {
+                              setAnswers({
+                                ...answers,
+                                [currentQuestion]: i,
+                              });
+                            } else {
+                              const current =
+                                answers[currentQuestion] || [];
+
+                              const updated = current.includes(i)
+                                ? current.filter((x) => x !== i)
+                                : [...current, i];
+
+                              setAnswers({
+                                ...answers,
+                                [currentQuestion]: updated,
+                              });
+                            }
+                          }}
+                          className={`w-full rounded-2xl border p-5 text-left transition ${
+                            selected
+                              ? "border-cyan-400 bg-cyan-500/15"
+                              : "border-slate-700 bg-slate-800/60 hover:border-cyan-400/40"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`flex h-8 w-8 items-center justify-center rounded-full border ${
+                                selected
+                                  ? "border-cyan-400 bg-cyan-400 text-black"
+                                  : "border-slate-500 text-slate-400"
+                              }`}
+                            >
+                              {q.type === "MCQ"
+                                ? selected
+                                  ? "◉"
+                                  : "○"
+                                : selected
+                                ? "✓"
+                                : "☐"}
+                            </div>
+
+                            <span>
+                              <span className="mr-2 font-bold">
+                                {String.fromCharCode(65 + i)}.
+                              </span>
+                              {option}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-cyan-400/10 bg-[#0B1220]/80 px-6 py-4">
+            <div className="flex justify-between">
+              <button
+                disabled={currentQuestion === 0}
+                onClick={() => setCurrentQuestion((p) => p - 1)}
+                className="rounded-xl border border-cyan-400/20 px-5 py-3 text-cyan-300 disabled:opacity-40"
+              >
+                ← Previous
+              </button>
+
+              {currentQuestion === questions.length - 1 ? (
+                <button
+                  onClick={submitQuiz}
+                  disabled={submitting}
+                  className="rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-8 py-3 font-bold text-white"
+                >
+                  {submitting ? "Submitting..." : "Submit Quiz"}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setCurrentQuestion((p) => p + 1)}
+                  className="rounded-xl bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 px-8 py-3 font-bold text-white"
+                >
+                  Next →
+                </button>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+  return (
+    <>
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-500 bg-clip-text text-transparent">
+          🧠 Quiz Center
+        </h1>
+
+        <p className="mt-3 text-slate-400">
+          Choose a subject and start practicing.
+        </p>
+      </div>
+
+      <div className="space-y-8">
+        {Object.entries(grouped).map(([subject, subjectQuizzes]) => (
+          <div key={subject}>
+            <h2 className="mb-4 text-2xl font-bold text-white">
+              {subject}
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              {subjectQuizzes.map((quiz) => (
+                <div
+                  key={quiz._id}
+                  className="rounded-[2rem] border border-cyan-400/15 bg-gradient-to-br from-[#0B1220]/95 via-[#081224]/95 to-[#140824]/95 p-5 shadow-[0_0_30px_rgba(34,211,238,.08)] transition hover:border-cyan-400/30 hover:shadow-[0_0_45px_rgba(34,211,238,.15)]"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span className="rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-bold text-cyan-300">
+                      Class {quiz.className}
+                    </span>
+
+                    <span className="rounded-full bg-violet-500/10 px-3 py-1 text-xs font-bold text-violet-300">
+                      {quiz.timeLimit} min
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-bold text-white">
+                    {quiz.quizName}
+                  </h3>
+
+                  <p className="mt-2 text-slate-400">
+                    {quiz.chapter}
+                  </p>
+
+                  <div className="mt-5 grid grid-cols-3 gap-3 text-center">
+                    <div className="rounded-xl bg-slate-900/60 p-3">
+                      <p className="text-lg font-black text-cyan-300">
+                        {quiz.totalQuestions}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        Questions
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-900/60 p-3">
+                      <p className="text-lg font-black text-violet-300">
+                        {quiz.marksPerQuestion}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        Marks
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl bg-slate-900/60 p-3">
+                      <p className="text-lg font-black text-emerald-300">
+                        {quiz.totalQuestions * quiz.marksPerQuestion}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        Total
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+  onClick={() => startQuiz(quiz)}
+  className="mt-6 w-full rounded-2xl bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 py-3 font-bold text-white shadow-[0_0_25px_rgba(34,211,238,.35)] transition hover:scale-[1.02]"
+>
+  🚀 Start Quiz
+</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {quizzes.length === 0 && (
+          <div className="rounded-3xl border border-cyan-400/15 bg-[#0B1220]/80 p-10 text-center backdrop-blur-xl">
+            <div className="text-5xl mb-3">📚</div>
+            <h3 className="text-2xl font-bold text-white">
+              No Quizzes Available
+            </h3>
+            <p className="mt-2 text-slate-400">
+              Your teacher hasn't published any quizzes yet.
+            </p>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
 function StudentResults() {
   const [results, setResults] = useState([]);
 
@@ -1385,7 +2149,11 @@ function StudentResults() {
         },
       });
 
-      setResults(res.data);
+      const sortedResults = [...res.data].sort(
+  (a, b) => new Date(b.testId?.date) - new Date(a.testId?.date)
+);
+
+setResults(sortedResults);
     } catch (err) {
       alert("Failed to load results");
     }
@@ -2427,6 +3195,1014 @@ function TestsPage({ search = "" }) {
   );
 }
 
+function QuizzesPage() {
+  const [quizzes, setQuizzes] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [managingQuiz, setManagingQuiz] = useState(null);
+const [attempts, setAttempts] = useState([]);
+const [selectedQuiz, setSelectedQuiz] = useState(null);
+const [loadingAttempts, setLoadingAttempts] = useState(false);
+
+  const [form, setForm] = useState({
+    quizName: "",
+    className: "",
+    subject: "",
+    chapter: "",
+    totalQuestions: "",
+    timeLimit: "",
+    marksPerQuestion: "",
+  });
+
+const loadAttempts = async (quiz) => {
+  try {
+    setLoadingAttempts(true);
+
+    const res = await api.get(`/quizzes/${quiz._id}/attempts`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+
+    setAttempts(res.data);
+    setSelectedQuiz(quiz);
+  } catch (err) {
+    alert(err.response?.data?.message || "Failed to load results");
+  } finally {
+    setLoadingAttempts(false);
+  }
+};
+
+  useEffect(() => {
+    loadQuizzes();
+  }, []);
+
+  const loadQuizzes = async () => {
+    try {
+      const res = await api.get("/quizzes", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      setQuizzes(res.data);
+    } catch (err) {
+      alert(
+        err.response?.data?.message || "Failed to load quizzes"
+      );
+    }
+  };
+
+  const createQuiz = async () => {
+    try {
+      if (
+        !form.quizName ||
+        !form.className ||
+        !form.subject ||
+        !form.chapter ||
+        !form.totalQuestions ||
+        !form.timeLimit ||
+        !form.marksPerQuestion
+      ) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      await api.post("/quizzes", form, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      alert("Quiz created successfully");
+
+      setShowForm(false);
+
+      setForm({
+        quizName: "",
+        className: "",
+        subject: "",
+        chapter: "",
+        totalQuestions: "",
+        timeLimit: "",
+        marksPerQuestion: "",
+      });
+
+      loadQuizzes();
+    } catch (err) {
+      alert(
+        err.response?.data?.message || "Failed to create quiz"
+      );
+    }
+  };
+
+  const deleteQuiz = async (id) => {
+    if (!window.confirm("Delete this quiz?")) return;
+
+    try {
+      await api.delete(`/quizzes/${id}`, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      loadQuizzes();
+    } catch (err) {
+      alert(
+        err.response?.data?.message || "Failed to delete quiz"
+      );
+    }
+  };
+  
+
+  const publishQuiz = async (id) => {
+    try {
+      await api.put(
+        `/quizzes/${id}/publish`,
+        {},
+        {
+          headers: {
+            Authorization:
+              "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+
+      alert("Quiz published successfully");
+
+      loadQuizzes();
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+          "Quiz cannot be published"
+      );
+    }
+  };
+
+  
+
+  return (
+    <>
+      {/* Header */}
+
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-center text-2xl sm:text-3xl lg:text-5xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-violet-400 to-fuchsia-500 bg-clip-text text-transparent leading-tight">
+          🧠 Quiz Management
+        </h1>
+
+        <p className="mt-3 flex items-center justify-center gap-2 text-center text-sm sm:text-base text-slate-400">
+          <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
+
+          <span>
+            Create and manage online quizzes
+          </span>
+        </p>
+      </div>
+
+      {/* Create Button */}
+
+      <div className="mb-6 flex justify-center sm:justify-end">
+        <button
+          onClick={() => setShowForm(true)}
+          className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 px-6 py-3 font-semibold text-white shadow-[0_0_30px_rgba(168,85,247,.35)] transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105"
+        >
+          ➕ Create Quiz
+        </button>
+      </div>
+
+      {/* Create Quiz Modal */}
+
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-400/20 bg-[#0B1220]/95 p-5 sm:p-7 shadow-[0_0_60px_rgba(34,211,238,.15)]">
+
+            <h2 className="mb-6 text-2xl sm:text-3xl font-bold text-white text-center">
+              Create New Quiz
+            </h2>
+
+            <div className="space-y-4 max-h-[55vh] overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+
+              <input
+                placeholder="Quiz Name"
+                value={form.quizName}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    quizName: e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+              />
+
+              <input
+                placeholder="Class"
+                value={form.className}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    className: e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+              />
+
+              <input
+                placeholder="Subject"
+                value={form.subject}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    subject: e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+              />
+
+              <input
+                placeholder="Chapter"
+                value={form.chapter}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    chapter: e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+              />
+
+              <input
+                type="number"
+                min="1"
+                placeholder="Questions required for quiz"
+                value={form.totalQuestions}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    totalQuestions: e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+              />
+
+              <input
+                type="number"
+                min="1"
+                placeholder="Time Limit (minutes)"
+                value={form.timeLimit}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    timeLimit: e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+              />
+
+              <input
+                type="number"
+                min="1"
+                placeholder="Marks per Question"
+                value={form.marksPerQuestion}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    marksPerQuestion: e.target.value,
+                  })
+                }
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+              />
+
+            </div>
+
+            <div className="mt-6 flex flex-col-reverse sm:flex-row justify-end gap-3">
+
+              <button
+                onClick={() => setShowForm(false)}
+                className="w-full sm:w-auto rounded-xl bg-slate-700 px-5 py-3 text-white hover:bg-slate-600 transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={createQuiz}
+                className="w-full sm:w-auto rounded-xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 px-6 py-3 font-semibold text-white transition-all hover:scale-[1.02]"
+              >
+                Create Quiz
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Quiz Table */}
+
+      <div className="space-y-6">
+  {quizzes.length === 0 ? (
+    <div className="rounded-3xl border border-cyan-400/15 bg-[#0B1220]/80 p-10 text-center backdrop-blur-xl">
+      <div className="text-5xl mb-3">🧠</div>
+      <h3 className="text-2xl font-bold text-white">No Quizzes Yet</h3>
+      <p className="mt-2 text-slate-400">
+        Create your first quiz to get started.
+      </p>
+    </div>
+  ) : (
+    quizzes.map((quiz) => (
+      <div
+        key={quiz._id}
+        className="group rounded-[2rem] border border-cyan-400/15 bg-gradient-to-br from-[#0B1220]/95 via-[#081224]/95 to-[#140824]/95 p-6 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,.10)] transition-all duration-300 hover:border-cyan-400/30 hover:shadow-[0_0_50px_rgba(168,85,247,.18)]"
+      >
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 bg-clip-text text-transparent">
+              {quiz.quizName}
+            </h2>
+
+            <p className="mt-1 text-slate-400">
+              {quiz.subject} • Class {quiz.className} • {quiz.chapter}
+            </p>
+          </div>
+
+          <span
+            className={`inline-flex rounded-full border px-4 py-2 text-sm font-bold uppercase ${
+              quiz.status === "published"
+                ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300"
+                : "border-yellow-400/30 bg-yellow-500/10 text-yellow-300"
+            }`}
+          >
+            {quiz.status}
+          </span>
+
+{quiz.publishedAt && (
+  <div className="mt-3 flex items-center gap-2 text-sm text-cyan-300">
+    <Calendar size={16} className="text-cyan-300" />
+    <span>
+      Published:{" "}
+      {new Date(quiz.publishedAt).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })}
+    </span>
+  </div>
+)}
+
+        </div>
+        
+        
+              
+
+        {/* Stats */}
+        <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+          <div className="rounded-3xl border border-cyan-400/10 bg-gradient-to-br from-slate-900/70 to-slate-950/90 p-6 shadow-[0_0_20px_rgba(34,211,238,.08)] transition hover:border-cyan-400/30 hover:shadow-[0_0_35px_rgba(34,211,238,.18)]">
+            <p className="text-2xl">📚</p>
+            <p className="mt-2 text-2xl font-black text-cyan-300">
+              {quiz.totalQuestions}
+            </p>
+            <p className="text-xs text-slate-400 uppercase">
+              Questions
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-violet-400/10 bg-violet-500/5 p-4 text-center">
+            <p className="text-2xl">⏱</p>
+            <p className="mt-2 text-2xl font-black text-violet-300">
+              {quiz.timeLimit}
+            </p>
+            <p className="text-xs text-slate-400 uppercase">
+              Minutes
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-pink-400/10 bg-pink-500/5 p-4 text-center">
+            <p className="text-2xl">⭐</p>
+            <p className="mt-2 text-2xl font-black text-pink-300">
+              {quiz.marksPerQuestion}
+            </p>
+            <p className="text-xs text-slate-400 uppercase">
+              Marks/Q
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-emerald-400/10 bg-emerald-500/5 p-4 text-center">
+            <p className="text-2xl">🏆</p>
+            <p className="mt-2 text-2xl font-black text-emerald-300">
+              {quiz.totalQuestions * quiz.marksPerQuestion}
+            </p>
+            <p className="text-xs text-slate-400 uppercase">
+              Total Marks
+            </p>
+          </div>
+
+        </div>
+
+        {/* Action Buttons */}
+<div className="mt-6 flex flex-wrap justify-end gap-3">
+  {/* Manage Questions */}
+  <button
+    onClick={() => setManagingQuiz(quiz)}
+    className="rounded-xl border border-cyan-400/20 bg-cyan-500/10 px-5 py-3 text-sm font-semibold text-cyan-300 transition-all duration-300 hover:border-cyan-300 hover:bg-cyan-500/20 hover:shadow-[0_0_25px_rgba(34,211,238,.45)] hover:-translate-y-0.5"
+  >
+    ✏ Manage Questions
+  </button>
+
+  {/* Publish */}
+  {quiz.status !== "published" && (
+    <button
+      onClick={() => publishQuiz(quiz._id)}
+      className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-5 py-3 text-sm font-semibold text-emerald-300 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-500/20 hover:shadow-[0_0_25px_rgba(16,185,129,.45)] hover:-translate-y-0.5"
+    >
+      🚀 Publish
+    </button>
+  )}
+
+  {/* Delete */}
+  <button
+    onClick={() => deleteQuiz(quiz._id)}
+    className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-5 py-3 text-sm font-semibold text-rose-300 transition-all duration-300 hover:border-rose-300 hover:bg-rose-500/20 hover:shadow-[0_0_25px_rgba(244,63,94,.45)] hover:-translate-y-0.5"
+  >
+    🗑 Delete
+  </button>
+
+  {/* View Results */}
+  <button
+    onClick={() => loadAttempts(quiz)}
+    className="rounded-xl border border-violet-400/20 bg-violet-500/10 px-5 py-3 text-sm font-semibold text-violet-300 transition-all duration-300 hover:border-violet-300 hover:bg-violet-500/20 hover:shadow-[0_0_25px_rgba(168,85,247,.45)] hover:-translate-y-0.5"
+  >
+    📊 View Results
+  </button>
+</div>
+
+      </div>
+    ))
+  )}
+</div>
+{managingQuiz && (
+  <QuestionManager
+    quiz={managingQuiz}
+    onClose={() => {
+      setManagingQuiz(null);
+      loadQuizzes();
+    }}
+  />
+
+  
+)}
+{selectedQuiz && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-3">
+    <div className="w-full max-w-6xl overflow-hidden rounded-[2rem] border border-cyan-400/20 bg-[#0B1220]/95 shadow-[0_0_60px_rgba(34,211,238,.18)]">
+
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-cyan-400/10 px-6 py-5">
+        <div>
+          <h2 className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-500 bg-clip-text text-transparent">
+            {selectedQuiz.quizName}
+          </h2>
+
+          <p className="text-slate-400">
+            {selectedQuiz.subject} • {selectedQuiz.chapter}
+          </p>
+        </div>
+
+        <button
+          onClick={() => setSelectedQuiz(null)}
+          className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-red-300 hover:bg-red-500/20"
+        >
+          ✕ Close
+        </button>
+      </div>
+
+      {/* Summary */}
+      <div className="grid grid-cols-2 gap-4 border-b border-cyan-400/10 px-6 py-5 md:grid-cols-4">
+
+        <div className="rounded-2xl bg-slate-900/50 p-4 text-center">
+          <div className="text-2xl font-black text-cyan-300">
+            {attempts.length}
+          </div>
+          <div className="text-xs uppercase tracking-wider text-slate-400">
+            Attempts
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-slate-900/50 p-4 text-center">
+          <div className="text-2xl font-black text-violet-300">
+            {selectedQuiz.totalQuestions}
+          </div>
+          <div className="text-xs uppercase tracking-wider text-slate-400">
+            Questions
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-slate-900/50 p-4 text-center">
+          <div className="text-2xl font-black text-pink-300">
+            {selectedQuiz.marksPerQuestion}
+          </div>
+          <div className="text-xs uppercase tracking-wider text-slate-400">
+            Marks/Q
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-slate-900/50 p-4 text-center">
+          <div className="text-2xl font-black text-emerald-300">
+            {selectedQuiz.totalQuestions * selectedQuiz.marksPerQuestion}
+          </div>
+          <div className="text-xs uppercase tracking-wider text-slate-400">
+            Total Marks
+          </div>
+        </div>
+
+      </div>
+
+      {/* Table */}
+      <div className="max-h-[60vh] overflow-auto">
+        <table className="w-full min-w-[900px] border-collapse text-sm">
+
+          <thead className="sticky top-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-500 text-white">
+            <tr>
+              <th className="px-4 py-3 text-center">Rank</th>
+              <th className="px-4 py-3 text-center">Roll</th>
+              <th className="px-4 py-3 text-left">Student</th>
+              <th className="px-4 py-3 text-center">Student Code</th>
+              <th className="px-4 py-3 text-center">Score</th>
+              <th className="px-4 py-3 text-center">Percentage</th>
+              <th className="px-4 py-3 text-center">Submitted</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {attempts.map((a, index) => {
+              const total =
+                selectedQuiz.totalQuestions *
+                selectedQuiz.marksPerQuestion;
+
+              const percentage =
+                total > 0
+                  ? ((a.obtainedMarks / total) * 100).toFixed(1)
+                  : "0.0";
+
+              return (
+                <tr
+                  key={a._id}
+                  className={`border-b border-slate-800 hover:bg-cyan-500/5 ${
+                    index % 2 === 0
+                      ? "bg-slate-900/40"
+                      : "bg-slate-800/20"
+                  }`}
+                >
+                  <td className="px-4 py-3 text-center font-bold text-cyan-300">
+                    #{index + 1}
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    {a.studentId?.rollNo}
+                  </td>
+
+                  <td className="px-4 py-3 font-semibold text-white">
+                    {a.studentId?.name}
+                  </td>
+
+                  <td className="px-4 py-3 text-center font-mono text-cyan-300">
+                    {a.studentId?.studentCode}
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    <span className="rounded-lg bg-cyan-500/10 px-3 py-1 font-bold text-cyan-300">
+                      {a.obtainedMarks}/{total}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    <span
+                      className={`rounded-lg px-3 py-1 font-bold ${
+                        percentage >= 75
+                          ? "bg-emerald-500/15 text-emerald-300"
+                          : percentage >= 40
+                          ? "bg-yellow-500/15 text-yellow-300"
+                          : "bg-red-500/15 text-red-300"
+                      }`}
+                    >
+                      {a.percentage.toFixed(1)}%
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3 text-center text-slate-400">
+                    {new Date(a.submittedAt).toLocaleString()}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+
+        </table>
+
+        {!loadingAttempts && attempts.length === 0 && (
+          <div className="p-10 text-center text-slate-400">
+            <div className="mb-3 text-5xl">📭</div>
+            <p className="text-lg">No student has submitted this quiz yet.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+    </>
+  );
+}
+
+function QuestionManager({ quiz, onClose }) {
+  const [questions, setQuestions] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+
+  const [form, setForm] = useState({
+    questionText: "",
+    type: "MCQ",
+    options: ["", "", "", ""],
+    correctAnswers: [],
+    marks: quiz.marksPerQuestion,
+  });
+
+useEffect(() => {
+  loadQuestions();
+}, [quiz._id]);
+
+  const loadQuestions = async () => {
+    try {
+      const res = await api.get(`/quizzes/${quiz._id}/questions`, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      setQuestions(res.data);
+    } catch {
+      alert("Failed to load questions");
+    }
+  };
+
+const saveQuestion = async () => {
+  try {
+    const headers = {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    };
+    if (!editingId && questions.length >= quiz.totalQuestions) {
+  return alert(`Maximum ${quiz.totalQuestions} questions allowed.`);
+}
+
+    if (editingId) {
+      await api.put(`/questions/${editingId}`, form, { headers });
+
+      alert("Question updated successfully");
+    } else {
+      await api.post(`/quizzes/${quiz._id}/questions`, form, {
+        headers,
+      });
+
+      alert("Question added successfully");
+    }
+
+setEditingId(null);
+
+setForm({
+  questionText: "",
+  type: "MCQ",
+  options: ["", "", "", ""],
+  correctAnswers: [],
+  marks: quiz.marksPerQuestion,
+});
+
+    loadQuestions();
+  } catch (err) {
+    alert(err.response?.data?.message || "Failed");
+  }
+};
+
+const deleteQuestion = async (id) => {
+  if (!window.confirm("Delete this question?")) return;
+
+  try {
+    await api.delete(`/questions/${id}`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+
+    loadQuestions();
+  } catch {
+    alert("Failed to delete question");
+  }
+};
+
+const editQuestion = (question) => {
+  setEditingId(question._id);
+
+  setForm({
+    questionText: question.questionText,
+    type: question.type,
+    options: [...question.options],
+    correctAnswers: [...question.correctAnswers],
+    marks: question.marks,
+  });
+
+  // Smooth scroll to editor
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
+return (
+  <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md p-2 sm:p-4">
+
+    <div className="mx-auto flex h-[96vh] w-full max-w-7xl flex-col overflow-hidden rounded-[2rem] border border-cyan-400/20 bg-[#0B1220]/95 shadow-[0_0_70px_rgba(34,211,238,.15)]">
+
+      {/* Header */}
+      <div className="sticky top-0 z-20 flex items-center justify-between border-b border-white/10 bg-[#0B1220]/95 px-6 py-5 backdrop-blur-xl">
+
+        <div>
+          <h2 className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-violet-400 to-fuchsia-500 bg-clip-text text-transparent">
+            {quiz.quizName}
+          </h2>
+
+          <p className="mt-1 text-slate-400">
+            {quiz.subject} • Class {quiz.className} • {quiz.chapter}
+          </p>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="rounded-xl bg-slate-800 px-4 py-2 text-white transition hover:bg-slate-700"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+
+        <div className="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr] gap-6">
+
+    {/* Left - Editor */}
+    <div className="rounded-3xl border border-cyan-400/10 bg-slate-900/40 p-5 backdrop-blur-xl">
+
+      {/* Progress */}
+
+      <div className="mb-6 flex items-center justify-between">
+
+        <div>
+          <h3 className="text-2xl font-bold text-white">
+            Question Editor
+          </h3>
+
+          <p className="text-slate-400">
+            Create MCQ or MSQ questions
+          </p>
+        </div>
+
+        <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-cyan-400/30 bg-cyan-500/10 text-cyan-300 shadow-[0_0_20px_rgba(34,211,238,.25)]">
+          <div className="text-center">
+            <div className="text-xl font-black">
+              {questions.length}
+            </div>
+            <div className="text-[10px] uppercase">
+              Added
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Question */}
+
+      <textarea
+        placeholder="Enter your question..."
+        rows={3}
+        value={form.questionText}
+        onChange={(e) =>
+          setForm({
+            ...form,
+            questionText: e.target.value,
+          })
+        }
+        className="w-full rounded-2xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+      />
+
+      {/* MCQ MSQ Pills */}
+
+      <div className="my-5 flex gap-3">
+
+        {["MCQ", "MSQ"].map((type) => (
+
+          <button
+            key={type}
+            onClick={() =>
+              setForm({
+                ...form,
+                type,
+                correctAnswers: [],
+              })
+            }
+            className={`rounded-full px-5 py-2 font-semibold transition ${
+              form.type === type
+                ? "bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-[0_0_20px_rgba(34,211,238,.35)]"
+                : "border border-slate-700 text-slate-300 hover:border-cyan-400"
+            }`}
+          >
+            {type}
+          </button>
+
+        ))}
+
+      </div>
+
+      {/* Options */}
+
+      <div className="space-y-3">
+
+        {form.options.map((option, index) => (
+
+          <div key={index} className="flex items-center gap-3">
+
+            {form.type === "MCQ" ? (
+
+              <input
+                type="radio"
+                checked={form.correctAnswers[0] === index}
+                onChange={() =>
+                  setForm({
+                    ...form,
+                    correctAnswers: [index],
+                  })
+                }
+                className="h-5 w-5 accent-cyan-400"
+              />
+
+            ) : (
+
+              <input
+                type="checkbox"
+                checked={form.correctAnswers.includes(index)}
+                onChange={(e) => {
+                  let answers = [...form.correctAnswers];
+
+                  if (e.target.checked) answers.push(index);
+                  else answers = answers.filter((a) => a !== index);
+
+                  setForm({
+                    ...form,
+                    correctAnswers: answers,
+                  });
+                }}
+                className="h-5 w-5 accent-cyan-400"
+              />
+
+            )}
+
+            <input
+              value={option}
+              placeholder={`Option ${index + 1}`}
+              onChange={(e) => {
+                const temp = [...form.options];
+
+                temp[index] = e.target.value;
+
+                setForm({
+                  ...form,
+                  options: temp,
+                });
+              }}
+              className="flex-1 rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+            />
+
+          </div>
+
+        ))}
+
+      </div>
+
+      <button
+  onClick={saveQuestion}
+  disabled={!editingId && questions.length >= quiz.totalQuestions}
+  className="mt-6 w-full rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 py-3 text-lg font-bold text-white shadow-[0_0_30px_rgba(168,85,247,.35)] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+>
+  {editingId
+    ? "💾 Update Question"
+    : questions.length >= quiz.totalQuestions
+    ? "🚫 Question Limit Reached"
+    : "➕ Add Question"}
+</button>
+
+    </div>
+
+    {/* Right - Question Bank */}
+
+    <div className="rounded-3xl border border-violet-400/10 bg-slate-900/40 p-5 backdrop-blur-xl">
+
+      <div className="mb-5 flex items-center justify-between">
+
+        <div>
+          <h3 className="text-2xl font-bold text-white">
+            Question Bank
+          </h3>
+
+          <p className="text-slate-400">
+            {questions.length}/{quiz.totalQuestions} required
+          </p>
+        </div>
+
+        <span className="rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-3 py-1 text-cyan-300">
+          {Math.max(quiz.totalQuestions - questions.length, 0)} Left
+        </span>
+
+      </div>
+
+      <div className="space-y-3 max-h-[65vh] overflow-y-auto pr-2">
+
+        {questions.map((q, index) => (
+
+          <div
+            key={q._id}
+            className="rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/70 to-slate-950/90 p-4 hover:border-cyan-400/20 transition"
+          >
+
+            <div className="mb-3 flex items-center justify-between">
+
+              <span className="rounded-lg bg-cyan-500/10 px-2 py-1 text-xs font-bold text-cyan-300">
+                Q{index + 1}
+              </span>
+
+              <div className="flex items-center gap-2">
+
+  <button
+    onClick={() => editQuestion(q)}
+    className="rounded-lg bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500/20"
+  >
+    ✏ Edit
+  </button>
+
+  <button
+    onClick={() => deleteQuestion(q._id)}
+    className="rounded-lg bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-300 transition hover:bg-red-500/20"
+  >
+    🗑 Delete
+  </button>
+
+</div>
+
+            </div>
+
+            <p className="font-semibold text-white">
+              {q.questionText}
+            </p>
+
+            <div className="mt-3 space-y-2">
+
+              {q.options.map((option, i) => (
+
+                <div
+                  key={i}
+                  className={`rounded-lg px-3 py-2 text-sm ${
+                    q.correctAnswers.includes(i)
+                      ? "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300"
+                      : "bg-slate-800/70 text-slate-300"
+                  }`}
+                >
+                  {q.correctAnswers.includes(i) ? "✓ " : ""}
+                  {option}
+                </div>
+
+              ))}
+
+            </div>
+
+            <div className="mt-3 flex justify-between text-xs text-slate-400">
+              <span>{q.type}</span>
+              <span>{q.marks} marks</span>
+            </div>
+
+          </div>
+
+        ))}
+
+        {questions.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-slate-700 p-8 text-center text-slate-500">
+            No questions yet.
+          </div>
+        )}
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+  </div>
+</div>
+);
+}
+
 function ResultsPage({ search }) {
   const [tests, setTests] = useState([]);
   const [selectedTest, setSelectedTest] = useState("");
@@ -2663,4 +4439,5 @@ export {
   TestsPage,
   ResultsPage,
   DashboardPage,
+  QuizzesPage,
 };
