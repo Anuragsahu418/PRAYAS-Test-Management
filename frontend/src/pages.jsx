@@ -1568,6 +1568,8 @@ const [currentQuestion, setCurrentQuestion] = useState(0);
 const [attemptId, setAttemptId] = useState(null);
 const [result, setResult] = useState(null);
 const [submitting, setSubmitting] = useState(false);
+const [tabWarnings, setTabWarnings] = useState(0);
+const [isFullscreen, setIsFullscreen] = useState(false);
 
 useEffect(() => {
   if (!activeQuiz) return;
@@ -1635,6 +1637,14 @@ const grouped = quizzes.reduce((acc, quiz) => {
     setCurrentQuestion(0);
     setAttemptId(res.data.attempt._id);
 
+    // Enter fullscreen
+try {
+  await document.documentElement.requestFullscreen();
+  setIsFullscreen(true);
+} catch {
+  alert("Please allow fullscreen for a secure exam.");
+}
+
 const restoredAnswers = {};
 
 (res.data.attempt.answers || []).forEach((a, index) => {
@@ -1664,6 +1674,84 @@ useEffect(() => {
   return () => clearInterval(timer);
 }, [activeQuiz]);
 
+useEffect(() => {
+  if (!activeQuiz) return;
+
+  const handleVisibility = () => {
+    if (!document.hidden) return;
+
+    setTabWarnings((prev) => {
+      const next = prev + 1;
+
+      alert(`Warning ${next}/3\nYou left the quiz tab.`);
+
+      if (next >= 3) {
+        submitQuiz();
+      }
+
+      return next;
+    });
+  };
+
+  document.addEventListener("visibilitychange", handleVisibility);
+
+  return () =>
+    document.removeEventListener("visibilitychange", handleVisibility);
+}, [activeQuiz]);
+
+useEffect(() => {
+  if (!activeQuiz) return;
+
+  const handleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      alert("Please stay in fullscreen during the quiz.");
+
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  };
+
+  document.addEventListener("fullscreenchange", handleFullscreen);
+
+  return () =>
+    document.removeEventListener(
+      "fullscreenchange",
+      handleFullscreen
+    );
+}, [activeQuiz]);
+
+useEffect(() => {
+  if (!activeQuiz) return;
+
+  const prevent = (e) => e.preventDefault();
+
+  document.addEventListener("copy", prevent);
+  document.addEventListener("cut", prevent);
+  document.addEventListener("paste", prevent);
+
+  return () => {
+    document.removeEventListener("copy", prevent);
+    document.removeEventListener("cut", prevent);
+    document.removeEventListener("paste", prevent);
+  };
+}, [activeQuiz]);
+
+useEffect(() => {
+  if (!activeQuiz) return;
+
+  const preventContext = (e) => e.preventDefault();
+
+  document.addEventListener(
+    "contextmenu",
+    preventContext
+  );
+
+  return () =>
+    document.removeEventListener(
+      "contextmenu",
+      preventContext
+    );
+}, [activeQuiz]);
+
 const submitQuiz = async () => {
   if (submitting) return;
 
@@ -1685,6 +1773,9 @@ const submitQuiz = async () => {
 
     setResult(res.data);
     setActiveQuiz(null);
+    if (document.fullscreenElement) {
+  document.exitFullscreen().catch(() => {});
+}
     setAttemptId(null);
   } catch {
     alert("Failed to submit quiz");
@@ -1803,7 +1894,7 @@ if (activeQuiz) {
   const q = questions[currentQuestion];
 
   return (
-    <div className="fixed inset-0 z-[100] bg-[#02030a] text-white overflow-hidden">
+    <div className="fixed inset-0 z-[100] select-none bg-[#02030a] text-white overflow-hidden">
       <div className="flex h-screen">
 
         {/* Desktop Question Palette */}
@@ -1843,6 +1934,18 @@ if (activeQuiz) {
                 </h1>
 
                 <p className="text-slate-400">{activeQuiz.chapter}</p>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+
+  <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-300">
+    🛡 Secure Exam Mode
+  </span>
+
+  <span className="rounded-full border border-yellow-400/20 bg-yellow-500/10 px-3 py-1 text-xs font-bold text-yellow-300">
+    Warnings: {tabWarnings}/3
+  </span>
+
+</div>
               </div>
 
               <div
@@ -2065,8 +2168,9 @@ if (activeQuiz) {
                     </span>
 
                     <span className="rounded-full bg-violet-500/10 px-3 py-1 text-xs font-bold text-violet-300">
-                      {quiz.timeLimit} min
-                    </span>
+  {Math.floor((quiz.totalQuestions * 20) / 60)}:
+  {String((quiz.totalQuestions * 20) % 60).padStart(2, "0")}
+</span>
                   </div>
 
                   <h3 className="text-xl font-bold text-white">
@@ -3567,14 +3671,17 @@ const loadAttempts = async (quiz) => {
           </div>
 
           <div className="rounded-2xl border border-violet-400/10 bg-violet-500/5 p-4 text-center">
-            <p className="text-2xl">⏱</p>
-            <p className="mt-2 text-2xl font-black text-violet-300">
-              {quiz.timeLimit}
-            </p>
-            <p className="text-xs text-slate-400 uppercase">
-              Minutes
-            </p>
-          </div>
+  <p className="text-2xl">⏱</p>
+
+  <p className="mt-2 text-2xl font-black text-violet-300">
+    {Math.floor((quiz.totalQuestions * 20) / 60)}:
+    {String((quiz.totalQuestions * 20) % 60).padStart(2, "0")}
+  </p>
+
+  <p className="text-xs text-slate-400 uppercase">
+    Total Time (20 sec/question)
+  </p>
+</div>
 
           <div className="rounded-2xl border border-pink-400/10 bg-pink-500/5 p-4 text-center">
             <p className="text-2xl">⭐</p>
@@ -3733,18 +3840,18 @@ const loadAttempts = async (quiz) => {
 
           <tbody>
             {attempts.map((a, index) => {
-              const total =
-                selectedQuiz.totalQuestions *
-                selectedQuiz.marksPerQuestion;
+  const total =
+    (selectedQuiz.totalQuestions ?? 0) *
+    (selectedQuiz.marksPerQuestion ?? 0);
 
-              const percentage =
-                total > 0
-                  ? ((a.obtainedMarks / total) * 100).toFixed(1)
-                  : "0.0";
+  const percentage =
+    total > 0
+      ? (((a.obtainedMarks ?? 0) / total) * 100).toFixed(1)
+      : "0.0";
 
               return (
                 <tr
-                  key={a._id}
+                  key={a.studentId}
                   className={`border-b border-slate-800 hover:bg-cyan-500/5 ${
                     index % 2 === 0
                       ? "bg-slate-900/40"
@@ -3756,22 +3863,22 @@ const loadAttempts = async (quiz) => {
                   </td>
 
                   <td className="px-4 py-3 text-center">
-                    {a.studentId?.rollNo}
-                  </td>
+  {a.rollNo || "-"}
+</td>
 
                   <td className="px-4 py-3 font-semibold text-white">
-                    {a.studentId?.name}
-                  </td>
+  {a.studentName || "Unknown"}
+</td>
 
                   <td className="px-4 py-3 text-center font-mono text-cyan-300">
-                    {a.studentId?.studentCode}
-                  </td>
+  {a.studentCode || "-"}
+</td>
 
                   <td className="px-4 py-3 text-center">
-                    <span className="rounded-lg bg-cyan-500/10 px-3 py-1 font-bold text-cyan-300">
-                      {a.obtainedMarks}/{total}
-                    </span>
-                  </td>
+  <span className="rounded-lg bg-cyan-500/10 px-3 py-1 font-bold text-cyan-300">
+    {a.obtainedMarks ?? 0}/{total}
+  </span>
+</td>
 
                   <td className="px-4 py-3 text-center">
                     <span
@@ -3783,12 +3890,14 @@ const loadAttempts = async (quiz) => {
                           : "bg-red-500/15 text-red-300"
                       }`}
                     >
-                      {a.percentage.toFixed(1)}%
+                    {percentage}%
                     </span>
                   </td>
 
                   <td className="px-4 py-3 text-center text-slate-400">
-                    {new Date(a.submittedAt).toLocaleString()}
+                    {a.submittedAt
+  ? new Date(a.submittedAt).toLocaleString("en-IN")
+  : "-"}
                   </td>
                 </tr>
               );
@@ -3814,7 +3923,56 @@ const loadAttempts = async (quiz) => {
 function QuestionManager({ quiz, onClose }) {
   const [questions, setQuestions] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
+const [aiForm, setAiForm] = useState({
+  className: quiz.className,
+  subject: quiz.subject,
+  chapter: quiz.chapter,
+  totalQuestions: quiz.totalQuestions,
+  difficulty: "Medium",
+  type: "MCQ",
+  marksPerQuestion: quiz.marksPerQuestion,
+});
+
+
+const generateAiQuestions = async () => {
+  try {
+    setAiLoading(true);
+
+    const res = await api.post(
+      "/ai/generate-questions",
+      aiForm,
+      {
+        headers: {
+          Authorization:
+            "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+for (const question of res.data) {
+  await api.post(
+    `/quizzes/${quiz._id}/questions`,
+    question,
+    {
+      headers: {
+        Authorization:
+          "Bearer " + localStorage.getItem("token"),
+      },
+    }
+  );
+}
+
+await loadQuestions();
+setShowAiModal(false);
+  } catch (err) {
+    alert("AI generation failed.");
+  } finally {
+    setAiLoading(false);
+  }
+};
   const [form, setForm] = useState({
     questionText: "",
     type: "MCQ",
@@ -3842,6 +4000,18 @@ useEffect(() => {
   };
 
 const saveQuestion = async () => {
+  if (!form.questionText.trim()) {
+    return alert("Question cannot be empty.");
+  }
+
+  const cleanedOptions = form.options.map((o) => o.trim());
+
+  if (cleanedOptions.some((o) => !o)) {
+    return alert("All options are required.");
+  }
+
+  setSaving(true);
+
   try {
     const headers = {
       Authorization: "Bearer " + localStorage.getItem("token"),
@@ -3874,8 +4044,10 @@ setForm({
 
     loadQuestions();
   } catch (err) {
-    alert(err.response?.data?.message || "Failed");
-  }
+  alert(err.response?.data?.message || "Failed");
+} finally {
+  setSaving(false);
+}
 };
 
 const deleteQuestion = async (id) => {
@@ -4047,7 +4219,11 @@ return (
                 onChange={(e) => {
                   let answers = [...form.correctAnswers];
 
-                  if (e.target.checked) answers.push(index);
+                  if (e.target.checked) {
+  if (!answers.includes(index)) {
+    answers.push(index);
+  }
+}
                   else answers = answers.filter((a) => a !== index);
 
                   setForm({
@@ -4082,17 +4258,35 @@ return (
 
       </div>
 
-      <button
-  onClick={saveQuestion}
-  disabled={!editingId && questions.length >= quiz.totalQuestions}
-  className="mt-6 w-full rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 py-3 text-lg font-bold text-white shadow-[0_0_30px_rgba(168,85,247,.35)] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+<div className="mt-6 flex flex-col sm:flex-row gap-3">
+<button
+  onClick={() => setShowAiModal(true)}
+  disabled={
+  saving ||
+  (!editingId &&
+    questions.length >= quiz.totalQuestions)
+}
+  className={`flex-1 rounded-2xl py-3 text-lg font-bold text-white shadow-[0_0_30px_rgba(34,211,238,.35)] transition ${
+    questions.length >= quiz.totalQuestions
+      ? "cursor-not-allowed bg-slate-700 text-slate-400"
+      : "bg-gradient-to-r from-cyan-500 via-violet-500 to-pink-500 hover:scale-[1.01]"
+  }`}
 >
-  {editingId
-    ? "💾 Update Question"
-    : questions.length >= quiz.totalQuestions
-    ? "🚫 Question Limit Reached"
-    : "➕ Add Question"}
+  ✨ Generate with AI
 </button>
+
+  <button
+    onClick={saveQuestion}
+    disabled={questions.length >= quiz.totalQuestions}
+    className="flex-1 rounded-2xl bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 py-3 text-lg font-bold text-white shadow-[0_0_30px_rgba(168,85,247,.35)] transition hover:scale-[1.01]"
+  >
+    {saving
+  ? "Saving..."
+  : editingId
+  ? "💾 Update Question"
+  : "➕ Add Question"}
+  </button>
+</div>
 
     </div>
 
@@ -4195,11 +4389,104 @@ return (
       </div>
 
     </div>
+</div>
+</div>
 
+    {showAiModal && (
+      <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div className="w-full max-w-md rounded-3xl border border-cyan-400/20 bg-[#0B1220] p-6">
+
+          <h3 className="text-2xl font-bold text-white">
+            ✨ Generate with AI
+          </h3>
+
+          <p className="mt-2 text-slate-400">
+            Generate questions automatically.
+          </p>
+
+          <div className="mt-5 space-y-4">
+
+            <input
+              value={aiForm.chapter}
+              onChange={(e) =>
+                setAiForm({
+                  ...aiForm,
+                  chapter: e.target.value,
+                })
+              }
+              placeholder="Chapter"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+            />
+
+            <select
+              value={aiForm.difficulty}
+              onChange={(e) =>
+                setAiForm({
+                  ...aiForm,
+                  difficulty: e.target.value,
+                })
+              }
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+            >
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+            </select>
+
+            <select
+              value={aiForm.type}
+              onChange={(e) =>
+                setAiForm({
+                  ...aiForm,
+                  type: e.target.value,
+                })
+              }
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+            >
+              <option>MCQ</option>
+              <option>MSQ</option>
+            </select>
+
+            <input
+              type="number"
+              min={1}
+              max={quiz.totalQuestions}
+              value={aiForm.totalQuestions}
+              onChange={(e) =>
+                setAiForm({
+                  ...aiForm,
+                  totalQuestions: Number(e.target.value),
+                })
+              }
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+            />
+
+          </div>
+
+          <div className="mt-6 flex gap-3">
+
+            <button
+              onClick={() => setShowAiModal(false)}
+              className="flex-1 rounded-xl bg-slate-700 py-3 text-white"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={generateAiQuestions}
+              disabled={aiLoading}
+              className="flex-1 rounded-xl bg-gradient-to-r from-cyan-500 via-violet-500 to-pink-500 py-3 font-bold text-white"
+            >
+              {aiLoading ? "Generating..." : "Generate"}
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    )}
   </div>
-</div>
   </div>
-</div>
 );
 }
 
@@ -4236,21 +4523,22 @@ function ResultsPage({ search }) {
     }
   };
 
-  const loadStudents = async () => {
-    try {
-      const res = await api.get("/students", {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
+const loadStudents = async (testId = "") => {
+  try {
+    const endpoint = testId ? `/results/${testId}` : "/students";
 
-      setStudents(res.data);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to load students");
-    }
-  };
+    const res = await api.get(endpoint, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
 
+    setStudents(res.data);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load students");
+  }
+};
 const saveResults = async () => {
   try {
     await api.post(`/results/${selectedTest}`, students, {
@@ -4359,7 +4647,7 @@ const filteredStudents = students.filter((student) =>
           <tbody>
             {filteredStudents.map((student, index) => (
               <tr
-                key={student.studentId}
+                key={student.studentId || student._id}
                 className={`
   border-b border-white/5
   transition-colors duration-200
@@ -4386,12 +4674,16 @@ const filteredStudents = students.filter((student) =>
                   <input
                     type="text"
                     disabled={isReadOnly}
-                    value={student.marks}
+                    value={student.marks ?? ""}
                     onChange={(e) => {
-                      const temp = [...students];
-                      temp[index].marks = e.target.value;
-                      setStudents(temp);
-                    }}
+  setStudents((prev) =>
+    prev.map((s) =>
+      (s.studentId || s._id) === (student.studentId || student._id)
+        ? { ...s, marks: e.target.value }
+        : s
+    )
+  );
+}}
                     className="h-10 w-24 rounded-xl border border-cyan-400/20 bg-slate-950/80 px-3 text-center text-sm font-semibold text-white outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/30 disabled:cursor-not-allowed disabled:opacity-70"
                   />
                 </td>
@@ -4400,12 +4692,16 @@ const filteredStudents = students.filter((student) =>
                   <input
                     type="text"
                     disabled={isReadOnly}
-                    value={student.remarks}
-                    onChange={(e) => {
-                      const temp = [...students];
-                      temp[index].remarks = e.target.value;
-                      setStudents(temp);
-                    }}
+                    value={student.remarks ?? ""}
+                   onChange={(e) => {
+  setStudents((prev) =>
+    prev.map((s) =>
+      (s.studentId || s._id) === (student.studentId || student._id)
+        ? { ...s, remarks: e.target.value }
+        : s
+    )
+  );
+}}
                     className="h-10 w-full min-w-[200px] rounded-xl border border-violet-400/15 bg-slate-950/80 px-4 text-sm text-white outline-none transition-all duration-300 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-70"
                   />
                 </td>
@@ -4419,15 +4715,15 @@ const filteredStudents = students.filter((student) =>
     </div>
 
     {!isReadOnly && (
-      <div className="mt-5 flex justify-center sm:justify-end">
-        {isReadOnly && (<button
-          onClick={saveResults}
-          className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-orange-500 via-pink-500 to-violet-600 px-5 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold text-white shadow-[0_0_30px_rgba(236,72,153,.35)] transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105 hover:shadow-[0_0_45px_rgba(236,72,153,.55)] whitespace-nowrap"
-        >
-          💾 Save Results
-        </button>)}
-      </div>
-    )}
+  <div className="mt-5 flex justify-center sm:justify-end">
+    <button
+      onClick={saveResults}
+      className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-orange-500 via-pink-500 to-violet-600 px-5 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold text-white shadow-[0_0_30px_rgba(236,72,153,.35)] transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105 hover:shadow-[0_0_45px_rgba(236,72,153,.55)] whitespace-nowrap"
+    >
+      💾 Save Results
+    </button>
+  </div>
+)}
   </>
 )}
     </>

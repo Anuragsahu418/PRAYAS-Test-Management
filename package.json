@@ -5,6 +5,7 @@
     "build": "cd frontend && npm install && npm run build"
   },
   "dependencies": {
+    "@google/genai": "^2.21.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",

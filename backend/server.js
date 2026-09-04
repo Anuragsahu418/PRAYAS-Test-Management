@@ -6,6 +6,12 @@ const {Admin,Student,Test,Result,Quiz,Question,QuizAttempt,
 } = require("./models");
 const { verifyToken, isAdmin, isStudent, isTeacher } = require("./middleware");
 
+const { GoogleGenAI } = require("@google/genai");
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -282,6 +288,9 @@ app.get("/api/results/:testId", verifyToken, isAdminOrTeacher, async (req, res) 
         remarks: result ? result.remarks : "",
       };
     });
+
+    console.log("Results in DB:", results);
+    console.log("Response Data:", data);
 
     res.json(data);
   } catch (err) {
@@ -999,8 +1008,11 @@ app.get(
       // Resume unfinished attempt
 const startedAt = new Date();
 
+// 20 seconds per question
+const totalTimeInSeconds = quiz.totalQuestions * 20;
+
 const expiresAt = new Date(
-  startedAt.getTime() + quiz.timeLimit * 60 * 1000
+  startedAt.getTime() + totalTimeInSeconds * 1000
 );
 
 const attempt = await QuizAttempt.create({
@@ -1072,11 +1084,15 @@ app.get(
         studentId: req.user.id,
         quizId: req.params.id,
         status: "submitted",
+        submittedAt: { $ne: null }, // Ignore incomplete attempts
       })
-        .sort({ submittedAt: -1 });
+        .populate("quizId", "quizName subject chapter totalQuestions marksPerQuestion")
+        .sort({ submittedAt: -1 })
+        .lean();
 
       res.json(attempts);
     } catch (err) {
+      console.error("History Error:", err);
       res.status(500).json({
         message: err.message,
       });
@@ -1111,7 +1127,6 @@ app.get(
     }
   }
 );
-
 // Admin: View quiz results (grouped by student)
 app.get(
   "/api/quizzes/:id/attempts",
@@ -1124,6 +1139,7 @@ app.get(
           $match: {
             quizId: new mongoose.Types.ObjectId(req.params.id),
             status: "submitted",
+            submittedAt: { $ne: null }, // Ignore incomplete attempts
           },
         },
         {
@@ -1135,24 +1151,18 @@ app.get(
           $group: {
             _id: "$studentId",
 
-            totalAttempts: {
-              $sum: 1,
-            },
+            totalAttempts: { $sum: 1 },
 
-            bestScore: {
-              $max: "$obtainedMarks",
-            },
+            bestScore: { $max: "$obtainedMarks" },
 
-            bestPercentage: {
-              $max: "$percentage",
-            },
+            bestPercentage: { $max: "$percentage" },
 
-            lastAttempt: {
-              $first: "$submittedAt",
-            },
+            lastAttempt: { $first: "$submittedAt" },
           },
         },
       ]);
+
+      const quiz = await Quiz.findById(req.params.id);
 
       const results = await Promise.all(
         attempts.map(async (a) => {
@@ -1165,20 +1175,31 @@ app.get(
             studentName: student?.name || "Unknown",
             rollNo: student?.rollNo || "-",
             studentCode: student?.studentCode || "-",
+
             totalAttempts: a.totalAttempts,
-            bestScore: a.bestScore,
-            bestPercentage: Number(a.bestPercentage.toFixed(1)),
-            lastAttempt: a.lastAttempt,
+
+            obtainedMarks: a.bestScore ?? 0,
+
+            percentage: Number((a.bestPercentage ?? 0).toFixed(1)),
+
+            submittedAt: a.lastAttempt,
+
+            totalMarks:
+              (quiz?.totalQuestions ?? 0) *
+              (quiz?.marksPerQuestion ?? 0),
           };
         })
       );
 
-      // Sort by best score, then latest attempt
       results.sort((a, b) => {
-        if (b.bestScore !== a.bestScore) {
-          return b.bestScore - a.bestScore;
+        if (b.obtainedMarks !== a.obtainedMarks) {
+          return b.obtainedMarks - a.obtainedMarks;
         }
-        return new Date(b.lastAttempt) - new Date(a.lastAttempt);
+
+        return (
+          new Date(b.submittedAt || 0) -
+          new Date(a.submittedAt || 0)
+        );
       });
 
       console.log("Grouped Results:", results);
@@ -1192,6 +1213,70 @@ app.get(
     }
   }
 );
+
+/* ================= AI Quiz Generator ================= */
+
+app.post(
+  "/api/ai/generate-questions",
+  verifyToken,
+  isAdmin,
+  async (req, res) => {
+    try {
+      const {
+        className,
+        subject,
+        chapter,
+        totalQuestions,
+        difficulty,
+        type,
+        marksPerQuestion,
+      } = req.body;
+
+      const prompt = `
+Generate ${totalQuestions} ${type} questions.
+
+Rules:
+- Class: ${className}
+- Subject: ${subject}
+- Chapter: ${chapter}
+- Difficulty: ${difficulty}
+- Every question carries ${marksPerQuestion} marks.
+- Return ONLY valid JSON.
+
+Format:
+
+[
+  {
+    "questionText":"...",
+    "type":"MCQ",
+    "options":["A","B","C","D"],
+    "correctAnswers":[1],
+    "marks":${marksPerQuestion}
+  }
+]
+`;
+
+      const response = await ai.models.generateContent({
+  model: "gemini-3.6-flash",
+  contents: prompt,
+});
+
+      const text = response.text
+  .replace(/^```json\s*/i, "")
+  .replace(/^```\s*/i, "")
+  .replace(/```$/i, "")
+  .trim();
+        
+
+      res.json(JSON.parse(text));
+    } catch (err) {
+      console.error("AI Error:", err);
+      res.status(500).json({ message: "AI generation failed" });
+    }
+  }
+);
+
+module.exports = app;
 
 app.get(
   "/api/quizzes/:quizId/student/:studentId/history",
