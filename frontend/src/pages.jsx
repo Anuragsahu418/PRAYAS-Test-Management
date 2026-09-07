@@ -1790,7 +1790,7 @@ const submitQuiz = async () => {
     <div className="min-h-screen bg-[#02030a] p-6 text-white">
       <div className="mx-auto max-w-5xl">
 
-        <div className="rounded-[2rem] border border-cyan-400/20 bg-[#0B1220]/90 p-8 backdrop-blur-2xl shadow-[0_0_50px_rgba(34,211,238,.12)]">
+        <div className="rounded-[1.5rem] border border-cyan-400/15 bg-[#0B1220]/90 p-3 sm:p-6 shadow-[0_0_35px_rgba(34,211,238,.12)]">
 
           <div className="text-center">
 
@@ -1894,8 +1894,15 @@ if (activeQuiz) {
   const q = questions[currentQuestion];
 
   return (
-    <div className="fixed inset-0 z-[100] select-none bg-[#02030a] text-white overflow-hidden">
-      <div className="flex h-screen">
+    <div
+  className="fixed inset-0 z-[100] select-none bg-[#02030a] text-white"
+  style={{
+    WebkitUserSelect: "none",
+    WebkitTouchCallout: "none",
+    userSelect: "none",
+  }}
+>
+  <div className="flex h-full">
 
         {/* Desktop Question Palette */}
         <div className="hidden lg:flex w-28 flex-col border-r border-cyan-400/10 bg-slate-950/80 p-4">
@@ -1923,191 +1930,195 @@ if (activeQuiz) {
         </div>
 
         {/* Main */}
-        <div className="flex flex-1 flex-col overflow-hidden">
+<div className="flex flex-1 flex-col min-w-0">
 
-          {/* Header */}
-          <div className="border-b border-cyan-400/10 bg-[#0B1220]/90 px-4 py-4 backdrop-blur-xl">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-2xl font-black bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-500 bg-clip-text text-transparent">
-                  {activeQuiz.quizName}
-                </h1>
+  {/* Header */}
+  <div className="border-b border-cyan-400/10 bg-[#0B1220]/90 px-3 py-2 backdrop-blur-xl">
+    <h1 className="text-lg sm:text-2xl font-black break-words bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-500 bg-clip-text text-transparent">
+  {activeQuiz.quizName}
+</h1>
 
-                <p className="text-slate-400">{activeQuiz.chapter}</p>
+<div className="mt-2 flex flex-wrap items-center gap-2">
 
-                <div className="mt-3 flex flex-wrap items-center gap-2">
+      <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-300">
+        🛡 Secure Exam
+      </span>
 
-  <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-300">
-    🛡 Secure Exam Mode
-  </span>
+      <span className="rounded-full border border-yellow-400/20 bg-yellow-500/10 px-2.5 py-1 text-[10px] font-bold text-yellow-300">
+        ⚠ {tabWarnings}/3
+      </span>
 
-  <span className="rounded-full border border-yellow-400/20 bg-yellow-500/10 px-3 py-1 text-xs font-bold text-yellow-300">
-    Warnings: {tabWarnings}/3
-  </span>
+      <span
+        className={`rounded-full border px-2.5 py-1 text-[10px] font-bold ${
+          timeLeft <= 60
+            ? "border-red-500/40 bg-red-500/20 text-red-300 animate-pulse"
+            : timeLeft <= 300
+            ? "border-orange-400/40 bg-orange-500/15 text-orange-300"
+            : "border-cyan-400/30 bg-cyan-500/10 text-cyan-300"
+        }`}
+      >
+        ⏱ {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:
+        {String(timeLeft % 60).padStart(2, "0")}
+      </span>
 
-</div>
-              </div>
+      <span className="rounded-full border border-violet-400/20 bg-violet-500/10 px-2.5 py-1 text-[10px] font-bold text-violet-300">
+        ✓ {Object.keys(answers).length}/{questions.length}
+      </span>
 
-              <div
-                className={`rounded-2xl border px-5 py-3 text-center ${
-                  timeLeft <= 60
-                    ? "border-red-500/40 bg-red-500/20 animate-pulse"
-                    : timeLeft <= 300
-                    ? "border-orange-400/40 bg-orange-500/15"
-                    : "border-cyan-400/30 bg-cyan-500/10"
-                }`}
-              >
-                <div className="text-xs text-slate-400">
-                  Answered {Object.keys(answers).length}/{questions.length}
-                </div>
+    </div>
+  </div>
 
-                <div className="text-2xl font-black text-rose-300">
-                  {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:
-                  {String(timeLeft % 60).padStart(2, "0")}
-                </div>
+  {/* Mobile Palette */}
+  <div className="lg:hidden border-b border-cyan-400/10 bg-[#0B1220]/70 py-2">
+    <div className="overflow-x-auto scrollbar-hide px-3">
+      <div className="flex gap-2 w-max">
+        {questions.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentQuestion(i)}
+            className={`h-9 w-9 shrink-0 rounded-lg text-xs font-bold transition ${
+              currentQuestion === i
+                ? "bg-gradient-to-r from-cyan-400 to-violet-500 text-black"
+                : answers[i] !== undefined
+                ? "bg-emerald-500 text-white"
+                : "bg-slate-800 text-slate-300"
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
 
-                <div className="text-xs text-slate-400">Time Left</div>
-              </div>
-            </div>
-          </div>
+  {/* Progress */}
+  <div className="border-b border-cyan-400/10 bg-[#0B1220]/60 px-3 py-2">
+    <div className="flex justify-between text-xs text-slate-400">
+      <span>Progress</span>
+      <span>{Object.keys(answers).length}/{questions.length}</span>
+    </div>
 
-          {/* Mobile Palette */}
-          <div className="lg:hidden border-b border-cyan-400/10 bg-[#0B1220]/70 px-4 py-3">
-            <div className="flex gap-2 overflow-x-auto">
-              {questions.map((_, i) => (
+    <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800">
+      <div
+        className="h-full bg-gradient-to-r from-cyan-400 via-violet-500 to-pink-500 transition-all"
+        style={{
+          width: `${
+            questions.length
+              ? (Object.keys(answers).length / questions.length) * 100
+              : 0
+          }%`,
+        }}
+      />
+    </div>
+  </div>
+
+  {/* Question Area */}
+  <div
+    className="flex-1 overflow-y-auto px-3 py-3 sm:px-6 lg:px-12"
+    style={{
+      paddingBottom: "88px",
+      minHeight: 0,
+    }}
+  >
+    {q && (
+      <div className="mx-auto w-full max-w-5xl">
+
+        <div className="mb-4 flex items-center justify-between">
+          <span className="rounded-xl bg-cyan-500/10 px-3 py-2 text-xs font-semibold text-cyan-300">
+            Question {currentQuestion + 1}/{questions.length}
+          </span>
+
+          <span className="rounded-xl bg-violet-500/10 px-3 py-2 text-xs font-semibold text-violet-300">
+            {q.marks} Marks
+          </span>
+        </div>
+
+        <div className="rounded-[1.5rem] border border-cyan-400/15 bg-[#0B1220]/90 p-3 sm:p-6 shadow-[0_0_35px_rgba(34,211,238,.12)]">
+
+          <h2 className="text-lg sm:text-3xl font-bold leading-snug break-words text-white">
+            {q.questionText}
+          </h2>
+
+          <div className="mt-5 space-y-3">
+            {q.options.map((option, i) => {
+              const selected =
+                q.type === "MCQ"
+                  ? answers[currentQuestion] === i
+                  : (answers[currentQuestion] || []).includes(i);
+
+              return (
                 <button
                   key={i}
-                  onClick={() => setCurrentQuestion(i)}
-                  className={`h-10 min-w-10 rounded-xl text-sm font-bold ${
-                    currentQuestion === i
-                      ? "bg-gradient-to-r from-cyan-400 to-violet-500 text-black"
-                      : answers[i] !== undefined
-                      ? "bg-emerald-500 text-white"
-                      : "bg-slate-800 text-slate-300"
+                  onClick={() => {
+                    if (q.type === "MCQ") {
+                      setAnswers({
+                        ...answers,
+                        [currentQuestion]: i,
+                      });
+                    } else {
+                      const current =
+                        answers[currentQuestion] || [];
+
+                      const updated = current.includes(i)
+                        ? current.filter((x) => x !== i)
+                        : [...current, i];
+
+                      setAnswers({
+                        ...answers,
+                        [currentQuestion]: updated,
+                      });
+                    }
+                  }}
+                  className={`w-full rounded-xl border p-3 sm:p-5 text-left transition ${
+                    selected
+                      ? "border-cyan-400 bg-cyan-500/15"
+                      : "border-slate-700 bg-slate-800/60 hover:border-cyan-400/40"
                   }`}
                 >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          </div>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border ${
+                        selected
+                          ? "border-cyan-400 bg-cyan-400 text-black"
+                          : "border-slate-500 text-slate-400"
+                      }`}
+                    >
+                      {q.type === "MCQ"
+                        ? selected
+                          ? "◉"
+                          : "○"
+                        : selected
+                        ? "✓"
+                        : "☐"}
+                    </div>
 
-          {/* Progress */}
-          <div className="border-b border-cyan-400/10 bg-[#0B1220]/60 px-6 py-3">
-            <div className="flex justify-between text-sm text-slate-400">
-              <span>Progress</span>
-              <span>{Object.keys(answers).length}/{questions.length}</span>
-            </div>
-
-            <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-cyan-400 via-violet-500 to-pink-500 transition-all"
-                style={{
-                  width: `${
-                    questions.length
-                      ? (Object.keys(answers).length / questions.length) * 100
-                      : 0
-                  }%`,
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Question Area */}
-          <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-8 lg:px-12">
-            {q && (
-              <div className="mx-auto w-full max-w-5xl">
-                <div className="mb-5 flex items-center justify-between">
-                  <span className="rounded-xl bg-cyan-500/10 px-3 py-2 text-cyan-300">
-                    Question {currentQuestion + 1}/{questions.length}
-                  </span>
-
-                  <span className="rounded-xl bg-violet-500/10 px-3 py-2 text-violet-300">
-                    {q.marks} Marks
-                  </span>
-                </div>
-
-                <div className="rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 p-6 sm:p-8 shadow-[0_0_35px_rgba(34,211,238,.12)]">
-                  <h2 className="text-2xl sm:text-3xl font-bold leading-relaxed text-white">
-                    {q.questionText}
-                  </h2>
-
-                  <div className="mt-8 space-y-4">
-                    {q.options.map((option, i) => {
-                      const selected =
-                        q.type === "MCQ"
-                          ? answers[currentQuestion] === i
-                          : (answers[currentQuestion] || []).includes(i);
-
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => {
-                            if (q.type === "MCQ") {
-                              setAnswers({
-                                ...answers,
-                                [currentQuestion]: i,
-                              });
-                            } else {
-                              const current =
-                                answers[currentQuestion] || [];
-
-                              const updated = current.includes(i)
-                                ? current.filter((x) => x !== i)
-                                : [...current, i];
-
-                              setAnswers({
-                                ...answers,
-                                [currentQuestion]: updated,
-                              });
-                            }
-                          }}
-                          className={`w-full rounded-2xl border p-5 text-left transition ${
-                            selected
-                              ? "border-cyan-400 bg-cyan-500/15"
-                              : "border-slate-700 bg-slate-800/60 hover:border-cyan-400/40"
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`flex h-8 w-8 items-center justify-center rounded-full border ${
-                                selected
-                                  ? "border-cyan-400 bg-cyan-400 text-black"
-                                  : "border-slate-500 text-slate-400"
-                              }`}
-                            >
-                              {q.type === "MCQ"
-                                ? selected
-                                  ? "◉"
-                                  : "○"
-                                : selected
-                                ? "✓"
-                                : "☐"}
-                            </div>
-
-                            <span>
-                              <span className="mr-2 font-bold">
-                                {String.fromCharCode(65 + i)}.
-                              </span>
-                              {option}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })}
+                    <span className="break-words">
+                      <span className="mr-2 font-bold">
+                        {String.fromCharCode(65 + i)}.
+                      </span>
+                      {option}
+                    </span>
                   </div>
-                </div>
-              </div>
-            )}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Footer */}
-          <div className="border-t border-cyan-400/10 bg-[#0B1220]/80 px-6 py-4">
-            <div className="flex justify-between">
+        </div>
+      </div>
+    )}
+  </div>
+
+  {/* Footer */}
+          <div
+  className="sticky bottom-0 border-t border-cyan-400/10 bg-[#0B1220]/95 backdrop-blur-xl px-3 py-3"
+  style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
+>
+            <div className="flex gap-2">
               <button
                 disabled={currentQuestion === 0}
                 onClick={() => setCurrentQuestion((p) => p - 1)}
-                className="rounded-xl border border-cyan-400/20 px-5 py-3 text-cyan-300 disabled:opacity-40"
+                className="flex-1 rounded-xl border border-cyan-400/20 px-3 py-3 text-sm sm:text-base text-cyan-300 disabled:opacity-40"
               >
                 ← Previous
               </button>
@@ -2116,14 +2127,14 @@ if (activeQuiz) {
                 <button
                   onClick={submitQuiz}
                   disabled={submitting}
-                  className="rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-8 py-3 font-bold text-white"
+                  className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 py-3 text-sm sm:text-base font-bold text-white"
                 >
                   {submitting ? "Submitting..." : "Submit Quiz"}
                 </button>
               ) : (
                 <button
                   onClick={() => setCurrentQuestion((p) => p + 1)}
-                  className="rounded-xl bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 px-8 py-3 font-bold text-white"
+                  className="flex-1 rounded-xl bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 px-3 py-3 text-sm sm:text-base font-bold text-white"
                 >
                   Next →
                 </button>

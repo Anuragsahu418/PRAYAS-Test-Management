@@ -1270,9 +1270,14 @@ Format:
 
       res.json(JSON.parse(text));
     } catch (err) {
-      console.error("AI Error:", err);
-      res.status(500).json({ message: "AI generation failed" });
-    }
+  console.error("AI Error:", err);
+
+  return res.status(500).json({
+    message: "AI generation failed",
+    error: err.message,
+    details: err.error || null,
+  });
+}
   }
 );
 
