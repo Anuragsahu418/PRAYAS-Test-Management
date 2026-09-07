@@ -39,7 +39,8 @@ const storage = new CloudinaryStorage({
   params: async (req, file) => ({
     folder: "previous-papers",
     resource_type: "raw",
-    public_id: `${Date.now()}-${path.parse(file.originalname).name}.pdf`,
+    public_id: `${Date.now()}-${path.parse(file.originalname).name}`,
+    format: "pdf",
   }),
 });
 
@@ -76,7 +77,7 @@ app.post("/api/papers", verifyToken, isAdmin, (req, res) => {
         className: req.body.className,
         subject: req.body.subject,
         year: Number(req.body.year),
-        pdfUrl: req.file.path,
+        pdfUrl: req.file.secure_url || req.file.path,
       });
 
       return res.status(201).json(paper);
