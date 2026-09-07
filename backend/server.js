@@ -36,47 +36,57 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => ({
+  params: {
     folder: "previous-papers",
-    resource_type: "raw", // Required for PDF files
-    public_id: `${Date.now()}-${path.parse(file.originalname).name}`,
-    format: "pdf",
-  }),
+    resource_type: "raw",
+  },
 });
 
 const upload = multer({
   storage,
   fileFilter(req, file, cb) {
     if (file.mimetype !== "application/pdf") {
-      return cb(new Error("Only PDF allowed"));
+      return cb(new Error("Only PDF files are allowed"));
     }
     cb(null, true);
   },
 });
 
-app.post(
-  "/api/papers",
-  verifyToken,
-  isAdmin,
-  upload.single("pdf"),
-  async (req, res) => {
-    try {
-      const paper = await PreviousPaper.create({
-  className: req.body.className,
-  subject: req.body.subject,
-  year: req.body.year,
-  title: req.body.title,
-  pdfUrl: req.file.path,
-});
+app.post("/api/papers", verifyToken, isAdmin, (req, res) => {
+  upload.single("pdf")(req, res, async (err) => {
+    if (err) {
+      console.error("Multer/Cloudinary Error:", err);
+      return res.status(500).json({
+        message: err.message || JSON.stringify(err),
+      });
+    }
 
-      res.json(paper);
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          message: "PDF file not received",
+        });
+      }
+
+      console.log("Cloudinary Upload:", req.file);
+
+      const paper = await PreviousPaper.create({
+        title: req.body.title,
+        className: req.body.className,
+        subject: req.body.subject,
+        year: Number(req.body.year),
+        pdfUrl: req.file.path,
+      });
+
+      return res.status(201).json(paper);
     } catch (err) {
-      res.status(500).json({
+      console.error("Paper Upload Error:", err);
+      return res.status(500).json({
         message: err.message,
       });
     }
-  }
-);
+  });
+});
 
 app.get("/api/papers", async (req, res) => {
   try {

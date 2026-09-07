@@ -4773,14 +4773,14 @@ const uploadPaper = async () => {
     form.append("className", paperForm.className);
     form.append("subject", paperForm.subject);
     form.append("year", paperForm.year);
-    form.append("examType", paperForm.examType);
 
-    await api.post("/papers", form, {
+    const res = await api.post("/papers", form, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
     });
 
+    console.log("Upload Success:", res.data);
     alert("Paper uploaded successfully!");
 
     setPaperFile(null);
@@ -4789,13 +4789,17 @@ const uploadPaper = async () => {
       className: "",
       subject: "",
       year: new Date().getFullYear(),
-      examType: "Final",
     });
 
     loadPapers();
   } catch (err) {
-    console.error(err);
-    alert("Upload failed.");
+    console.error("Upload Error:", err.response?.data || err);
+
+    alert(
+      err.response?.data?.message ||
+      err.message ||
+      "Upload failed."
+    );
   }
 };
 
