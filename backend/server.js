@@ -1,22 +1,25 @@
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
-const {Admin,Student,Test,Result,Quiz,Question,QuizAttempt,
-} = require("./models");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const {Admin,Student,Test,Result,Quiz,Question,QuizAttempt,PreviousPaper,} = require("./models");
 const { verifyToken, isAdmin, isStudent, isTeacher } = require("./middleware");
-
 const { GoogleGenAI } = require("@google/genai");
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
-
+const ai = new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY,});
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use("/uploads", express.static("uploads"));
+
+
+
 
 const isAdminOrTeacher = (req, res, next) => {
   if (req.user.role === "admin" || req.user.role === "teacher") {
@@ -26,9 +29,79 @@ const isAdminOrTeacher = (req, res, next) => {
   return res.status(403).json({ message: "Access denied" });
 };
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, "uploads", "papers");
+
+    fs.mkdirSync(uploadPath, { recursive: true }); // Creates folder if missing
+
+    cb(null, uploadPath);
+  },
+
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({
+  storage,
+  fileFilter(req, file, cb) {
+    if (file.mimetype !== "application/pdf") {
+      return cb(new Error("Only PDF allowed"));
+    }
+
+    cb(null, true);
+  },
+});
+
+
+app.post(
+  "/api/papers",
+  verifyToken,
+  isAdmin,
+  upload.single("pdf"),
+  async (req, res) => {
+    try {
+      const paper = await PreviousPaper.create({
+  className: req.body.className,
+  subject: req.body.subject,
+  year: req.body.year,
+  title: req.body.title,
+  pdfUrl: `/uploads/papers/${req.file.filename}`,
+});
+
+      res.json(paper);
+    } catch (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+    }
+  }
+);
+
+app.get("/api/papers", async (req, res) => {
+  try {
+    const filter = {};
+
+    if (req.query.className)
+      filter.className = req.query.className;
+
+    if (req.query.subject)
+      filter.subject = req.query.subject;
+
+    const papers = await PreviousPaper.find(filter).sort({
+  year: -1,     // Latest year first
+  subject: 1,   // A-Z within the same year
+  title: 1,     // A-Z within the same subject
+});
+
+    res.json(papers);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+});
 
 // MongoDB Connection
 mongoose
@@ -503,7 +576,9 @@ app.get("/api/student/results", verifyToken, isStudent, async (req, res) => {
 // Admin: Get all quizzes
 app.get("/api/quizzes", verifyToken, isAdmin, async (req, res) => {
   try {
-    const quizzes = await Quiz.find().sort({ createdAt: -1 });
+    const quizzes = await Quiz.find().sort({
+  quizName: 1,
+});
 
     res.json(quizzes);
   } catch (err) {
@@ -841,7 +916,9 @@ app.post(
 app.get("/api/student/quizzes", verifyToken, isStudent, async (req, res) => {
   try {
     const quizzes = await Quiz.find({ status: "published" })
-      .sort({ subject: 1, chapter: 1 });
+  .sort({
+    quizName: 1,
+  });
 
     res.json(quizzes);
   } catch (err) {
@@ -1005,53 +1082,39 @@ app.get(
 
       const studentId = req.user.id;
 
-      // Resume unfinished attempt
-const startedAt = new Date();
+      // Resume unfinished attempt if it exists
+      let attempt = await QuizAttempt.findOne({
+        studentId,
+        quizId: quiz._id,
+        status: "in-progress",
+      });
 
-// 20 seconds per question
-const totalTimeInSeconds = quiz.totalQuestions * 20;
+      // Create a new attempt if none exists
+      if (!attempt) {
+        const startedAt = new Date();
 
-const expiresAt = new Date(
-  startedAt.getTime() + totalTimeInSeconds * 1000
-);
+        // 20 seconds per question
+        const totalTimeInSeconds = quiz.totalQuestions * 20;
 
-const attempt = await QuizAttempt.create({
-  studentId,
-  quizId: quiz._id,
-  startedAt,
-  expiresAt,
-  status: "in-progress",
-  obtainedMarks: 0,
-  percentage: 0,
-  submittedAt: null,
-  answers: questions.map((q) => ({
-    questionId: q._id,
-    selectedAnswers: [],
-  })),
-});
+        const expiresAt = new Date(
+          startedAt.getTime() + totalTimeInSeconds * 1000
+        );
 
-// Create new attempt if none exists
-if (!attempt) {
-  const startedAt = new Date();
-  const expiresAt = new Date(
-    startedAt.getTime() + quiz.timeLimit * 60 * 1000
-  );
-
-  attempt = await QuizAttempt.create({
-    studentId,
-    quizId: quiz._id,
-    startedAt,
-    expiresAt,
-    status: "in-progress",
-    obtainedMarks: 0,
-    percentage: 0,
-    submittedAt: null,
-    answers: questions.map((q) => ({
-      questionId: q._id,
-      selectedAnswers: [],
-    })),
-  });
-}
+        attempt = await QuizAttempt.create({
+          studentId,
+          quizId: quiz._id,
+          startedAt,
+          expiresAt,
+          status: "in-progress",
+          obtainedMarks: 0,
+          percentage: 0,
+          submittedAt: null,
+          answers: questions.map((q) => ({
+            questionId: q._id,
+            selectedAnswers: [],
+          })),
+        });
+      }
 
       const remainingTime = Math.max(
         Math.floor((attempt.expiresAt.getTime() - Date.now()) / 1000),

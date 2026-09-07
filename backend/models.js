@@ -256,6 +256,48 @@ const QuizAttemptSchema = new mongoose.Schema(
 );
 
 
+const PreviousPaperSchema = new mongoose.Schema(
+  {
+    className: {
+      type: String,
+      required: true,
+    },
+
+    subject: {
+      type: String,
+      required: true,
+    },
+
+    year: {
+      type: Number,
+      required: true,
+    },
+
+    examType: {
+  type: String,
+  default: "Previous Paper",
+},
+
+    title: {
+      type: String,
+      required: true,
+    },
+
+    pdfUrl: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const PreviousPaper = mongoose.model(
+  "PreviousPaper",
+  PreviousPaperSchema
+);
+
 const Admin = mongoose.model("Admin", AdminSchema);
 const Student = mongoose.model("Student", StudentSchema);
 const Test = mongoose.model("Test", TestSchema);
@@ -265,6 +307,8 @@ const Quiz = mongoose.model("Quiz", QuizSchema);
 const Question = mongoose.model("Question", QuestionSchema);
 const QuizAttempt = mongoose.model("QuizAttempt", QuizAttemptSchema);
 
+
+
 module.exports = {
   Admin,
   Student,
@@ -273,4 +317,6 @@ module.exports = {
   Quiz,
   Question,
   QuizAttempt,
+  PreviousPaper,
 };
+

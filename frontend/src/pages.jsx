@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "./api";
-import { User, Lock, Eye, EyeOff, Users, FileText, TrendingUp, Trophy, BarChart4, LayoutDashboard, ClipboardList, LogOut,GraduationCap,Calendar} from "lucide-react";
+import api, { SERVER_URL } from "./api";
+import { User, Lock, Eye, EyeOff, Users, FileText, TrendingUp, Trophy, BarChart4, LayoutDashboard, ClipboardList, LogOut,GraduationCap,Calendar,BookOpen} from "lucide-react";
 
 // ================= LOGIN =================
 
@@ -684,19 +684,22 @@ export function AdminDashboard() {
   const [page, setPage] = useState(role === "teacher" ? "students" : "dashboard");
   const [search, setSearch] = useState("");
 
-const menus = role === "teacher"
-  ? [
-      { id: "dashboard", title: "Dashboard", icon: <LayoutDashboard size={20} /> },
-      { id: "students", title: "Students", icon: <Users size={20} /> },
-      { id: "results", title: "Results", icon: <FileText size={20} /> },
-    ]
-  : [
-      { id: "dashboard", title: "Dashboard", icon: <LayoutDashboard size={20} /> },
-      { id: "students", title: "Students", icon: <Users size={20} /> },
-      { id: "tests", title: "Tests", icon: <ClipboardList size={20} /> },
-      { id: "quizzes", title: "Quizzes", icon: <ClipboardList size={20} />},
-      { id: "results", title: "Results", icon: <FileText size={20} /> },
-    ];
+const menus =
+  role === "teacher"
+    ? [
+        { id: "dashboard", title: "Dashboard", icon: <LayoutDashboard size={20} /> },
+        { id: "students", title: "Students", icon: <Users size={20} /> },
+        { id: "results", title: "Results", icon: <FileText size={20} /> },
+        { id: "previous-papers", title: "Previous Papers", icon: <BookOpen size={20} /> },
+      ]
+    : [
+        { id: "dashboard", title: "Dashboard", icon: <LayoutDashboard size={20} /> },
+        { id: "students", title: "Students", icon: <Users size={20} /> },
+        { id: "tests", title: "Tests", icon: <ClipboardList size={20} /> },
+        { id: "quizzes", title: "Quizzes", icon: <ClipboardList size={20} /> },
+        { id: "results", title: "Results", icon: <FileText size={20} /> },
+        { id: "previous-papers", title: "Previous Papers", icon: <BookOpen size={20} /> },
+      ];
 
   return (
     <div className="min-h-screen bg-[#02030a] text-white flex flex-col lg:flex-row overflow-y-auto touch-pan-y">
@@ -864,6 +867,7 @@ const menus = role === "teacher"
           {role !== "teacher" && page === "tests" && <TestsPage search={search} />}
           {role !== "teacher" && page === "quizzes" && <QuizzesPage />}
           {page === "results" && <ResultsPage search={search} />}
+          {page === "previous-papers" && <PreviousYearPapers />}
 
     </main>
     </div>
@@ -1268,13 +1272,14 @@ return (
       {/* Navigation */}
       <ul className="space-y-3 flex-1">
         {
-          [ "dashboard","quizzes","results","performance"].map((item) => {
+          ["dashboard", "quizzes", "results", "performance", "previous-papers"].map((item) => {
             const icons = {
             dashboard: "🏠",
             quizzes: "🧠",
             results: "📊",
             performance: "📈",
-          };
+            "previous-papers": "📚",
+};
 
             return (
               <li
@@ -1330,6 +1335,8 @@ return (
         {page === "quizzes" && <StudentQuizHome />}
         {page === "results" && <StudentResults />}
         {page === "performance" && <StudentPerformance />}
+        {page === "previous-papers" && <PreviousYearPapers />}
+        
         
       </div>
 
@@ -4741,10 +4748,188 @@ const filteredStudents = students.filter((student) =>
   );
 }
 
+function PreviousYearPapers() {
+  const [papers, setPapers] = useState([]);
+  const role = localStorage.getItem("role");
+const isAdmin = role === "admin";
+
+const [paperFile, setPaperFile] = useState(null);
+const [paperForm, setPaperForm] = useState({
+  title: "",
+  className: "",
+  subject: "",
+  year: new Date().getFullYear(),
+  examType: "Final",
+});
+
+const uploadPaper = async () => {
+  if (!paperFile) return alert("Select a PDF first.");
+
+  try {
+    const form = new FormData();
+
+    form.append("pdf", paperFile);
+    form.append("title", paperForm.title);
+    form.append("className", paperForm.className);
+    form.append("subject", paperForm.subject);
+    form.append("year", paperForm.year);
+    form.append("examType", paperForm.examType);
+
+    await api.post("/papers", form, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
+
+    alert("Paper uploaded successfully!");
+
+    setPaperFile(null);
+    setPaperForm({
+      title: "",
+      className: "",
+      subject: "",
+      year: new Date().getFullYear(),
+      examType: "Final",
+    });
+
+    loadPapers();
+  } catch (err) {
+    console.error(err);
+    alert("Upload failed.");
+  }
+};
+
+  useEffect(() => {
+    loadPapers();
+  }, []);
+
+  const loadPapers = async () => {
+    try {
+      const res = await api.get("/papers");
+      setPapers(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+return (
+  <div className="mt-12">
+    <div className="mb-8 text-center sm:text-left">
+      <h1 className="text-2xl sm:text-3xl lg:text-5xl font-black bg-gradient-to-r from-cyan-400 via-violet-400 to-pink-500 bg-clip-text text-transparent">
+        📚 Previous Year Papers
+      </h1>
+
+      <p className="mt-2 text-slate-400">
+        Download previous year question papers.
+      </p>
+    </div>
+
+    {/* Admin Upload Section */}
+    {isAdmin && (
+      <div className="mb-6 rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 p-5 backdrop-blur-2xl">
+        <h3 className="mb-4 text-xl font-bold text-white">
+          📤 Upload Previous Paper
+        </h3>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <input
+            placeholder="Title"
+            value={paperForm.title}
+            onChange={(e) =>
+              setPaperForm({ ...paperForm, title: e.target.value })
+            }
+            className="rounded-xl bg-slate-800 p-3 text-white outline-none focus:ring-2 focus:ring-cyan-400"
+          />
+
+          <input
+            placeholder="Class"
+            value={paperForm.className}
+            onChange={(e) =>
+              setPaperForm({ ...paperForm, className: e.target.value })
+            }
+            className="rounded-xl bg-slate-800 p-3 text-white outline-none focus:ring-2 focus:ring-cyan-400"
+          />
+
+          <input
+            placeholder="Subject"
+            value={paperForm.subject}
+            onChange={(e) =>
+              setPaperForm({ ...paperForm, subject: e.target.value })
+            }
+            className="rounded-xl bg-slate-800 p-3 text-white outline-none focus:ring-2 focus:ring-cyan-400"
+          />
+
+          <input
+            type="number"
+            value={paperForm.year}
+            onChange={(e) =>
+              setPaperForm({ ...paperForm, year: e.target.value })
+            }
+            className="rounded-xl bg-slate-800 p-3 text-white outline-none focus:ring-2 focus:ring-cyan-400"
+          />
+        </div>
+
+        <input
+          type="file"
+          accept="application/pdf"
+          onChange={(e) => setPaperFile(e.target.files[0])}
+          className="mt-4 block w-full text-white file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-500 file:px-4 file:py-2 file:font-semibold file:text-white hover:file:bg-cyan-600"
+        />
+
+        <button
+          onClick={uploadPaper}
+          className="mt-4 rounded-xl bg-gradient-to-r from-cyan-500 via-violet-500 to-pink-500 px-5 py-3 font-bold text-white shadow-[0_0_20px_rgba(34,211,238,.3)]"
+        >
+          📤 Upload PDF
+        </button>
+      </div>
+    )}
+
+    {/* Papers List */}
+    <div className="grid gap-4">
+      {papers.map((paper) => (
+        <div
+          key={paper._id}
+          className="rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 p-5 backdrop-blur-2xl"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-white">
+                {paper.title}
+              </h3>
+
+              <p className="text-sm text-slate-400">
+                Class {paper.className} • {paper.subject} • {paper.year}
+              </p>
+            </div>
+
+            <a
+  href={`${SERVER_URL}${paper.pdfUrl}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="rounded-xl bg-gradient-to-r from-cyan-500 via-violet-500 to-pink-500 px-5 py-3 text-center font-bold text-white"
+>
+  ⬇ Download
+</a>
+          </div>
+        </div>
+      ))}
+
+      {papers.length === 0 && (
+        <div className="rounded-2xl border border-slate-700 bg-slate-900/40 p-8 text-center text-slate-400">
+          No papers uploaded yet.
+        </div>
+      )}
+    </div>
+  </div>
+);
+}
+
 export {
   StudentsPage,
   TestsPage,
   ResultsPage,
   DashboardPage,
   QuizzesPage,
+  PreviousYearPapers,
 };
