@@ -11,7 +11,6 @@ const ai = new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY,});
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const multer = require("multer");
 const { v2: cloudinary } = require("cloudinary");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
