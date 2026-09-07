@@ -36,10 +36,11 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
+  params: async (req, file) => ({
     folder: "previous-papers",
     resource_type: "raw",
-  },
+    public_id: `${Date.now()}-${path.parse(file.originalname).name}.pdf`,
+  }),
 });
 
 const upload = multer({

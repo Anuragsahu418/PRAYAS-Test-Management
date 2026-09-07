@@ -4908,7 +4908,8 @@ return (
             </div>
 
             <a
-  href={paper.pdfUrl}
+  href={`${paper.pdfUrl}?fl_attachment`}
+  download
   target="_blank"
   rel="noopener noreferrer"
   className="rounded-xl bg-gradient-to-r from-cyan-500 via-violet-500 to-pink-500 px-5 py-3 text-center font-bold text-white"
