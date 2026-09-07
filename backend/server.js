@@ -11,14 +11,14 @@ const ai = new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY,});
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const multer = require("multer");
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
-
-
 
 
 const isAdminOrTeacher = (req, res, next) => {
@@ -29,18 +29,20 @@ const isAdminOrTeacher = (req, res, next) => {
   return res.status(403).json({ message: "Access denied" });
 };
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, "uploads", "papers");
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-    fs.mkdirSync(uploadPath, { recursive: true }); // Creates folder if missing
-
-    cb(null, uploadPath);
-  },
-
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => ({
+    folder: "previous-papers",
+    resource_type: "raw", // Required for PDF files
+    public_id: `${Date.now()}-${path.parse(file.originalname).name}`,
+    format: "pdf",
+  }),
 });
 
 const upload = multer({
@@ -49,11 +51,9 @@ const upload = multer({
     if (file.mimetype !== "application/pdf") {
       return cb(new Error("Only PDF allowed"));
     }
-
     cb(null, true);
   },
 });
-
 
 app.post(
   "/api/papers",
@@ -67,7 +67,7 @@ app.post(
   subject: req.body.subject,
   year: req.body.year,
   title: req.body.title,
-  pdfUrl: `/uploads/papers/${req.file.filename}`,
+  pdfUrl: req.file.path,
 });
 
       res.json(paper);

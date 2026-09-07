@@ -4904,7 +4904,7 @@ return (
             </div>
 
             <a
-  href={`${SERVER_URL}${paper.pdfUrl}`}
+  href={paper.pdfUrl}
   target="_blank"
   rel="noopener noreferrer"
   className="rounded-xl bg-gradient-to-r from-cyan-500 via-violet-500 to-pink-500 px-5 py-3 text-center font-bold text-white"
