@@ -4907,15 +4907,31 @@ return (
               </p>
             </div>
 
-           <a
-  href={paper.pdfUrl}
-  target="_blank"
-  rel="noopener noreferrer"
-  download
+           <button
+  onClick={async () => {
+    try {
+      const response = await fetch(paper.pdfUrl);
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+
+      a.href = url;
+      a.download = `${paper.title}.pdf`; // Correct filename
+      document.body.appendChild(a);
+      a.click();
+
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to download PDF.");
+      console.error(err);
+    }
+  }}
   className="rounded-xl bg-gradient-to-r from-cyan-500 via-violet-500 to-pink-500 px-5 py-3 text-center font-bold text-white"
 >
   ⬇ Download
-</a>
+</button>
           </div>
         </div>
       ))}

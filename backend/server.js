@@ -27,11 +27,11 @@ const isAdminOrTeacher = (req, res, next) => {
 
   return res.status(403).json({ message: "Access denied" });
 };
-
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
 });
 
 const storage = new CloudinaryStorage({
@@ -39,20 +39,13 @@ const storage = new CloudinaryStorage({
   params: async (req, file) => ({
     folder: "previous-papers",
     resource_type: "raw",
-    public_id: `${Date.now()}-${path.parse(file.originalname).name}`,
-    format: "pdf",
+    use_filename: true,
+    unique_filename: true,
+    overwrite: false,
   }),
 });
 
-const upload = multer({
-  storage,
-  fileFilter(req, file, cb) {
-    if (file.mimetype !== "application/pdf") {
-      return cb(new Error("Only PDF files are allowed"));
-    }
-    cb(null, true);
-  },
-});
+const upload = multer({ storage });
 
 app.post("/api/papers", verifyToken, isAdmin, (req, res) => {
   upload.single("pdf")(req, res, async (err) => {
