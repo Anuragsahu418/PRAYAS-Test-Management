@@ -129,18 +129,52 @@ app.get("/api/create-admins", async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
 
-  // Check Admin
+  // =========================
+  // Guest Login
+  // =========================
+  if (
+    username.toLowerCase() === "guest" &&
+    password === "guest123"
+  ) {
+    const token = jwt.sign(
+      {
+        id: "guest",
+        role: "student",
+        guest: true,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.json({
+      role: "student",
+      token,
+      guest: true,
+      student: {
+        id: "guest",
+        name: "Guest Explorer",
+        rollNo: "GUEST",
+        studentCode: "GUEST-001",
+      },
+    });
+  }
+
+  // =========================
+  // Check Admin / Teacher
+  // =========================
   let user = await Admin.findOne({ username });
 
   if (user) {
     const match = await bcrypt.compare(password, user.password);
 
-    if (!match)
-      return res.status(401).json({ message: "Invalid Password" });
+    if (!match) {
+      return res.status(401).json({
+        message: "Invalid Password",
+      });
+    }
 
     const role = user.username === "Teacher" ? "teacher" : "admin";
 
@@ -156,38 +190,48 @@ app.post("/api/login", async (req, res) => {
     });
   }
 
+  // =========================
   // Check Student
+  // =========================
   user = await Student.findOne({ studentCode: username });
 
   if (user) {
     const match = await bcrypt.compare(password, user.password);
 
-    if (!match)
-      return res.status(401).json({ message: "Invalid Password" });
+    if (!match) {
+      return res.status(401).json({
+        message: "Invalid Password",
+      });
+    }
 
     const token = jwt.sign(
-      { id: user._id, role: "student" },
+      {
+        id: user._id,
+        role: "student",
+        guest: false,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-  return res.json({
-  role: "student",
-  token,
-
-  student: {
-    id: user._id,
-    name: user.name,
-    rollNo: user.rollNo,
-    studentCode: user.studentCode,
-  },
-});
+    return res.json({
+      role: "student",
+      token,
+      guest: false,
+      student: {
+        id: user._id,
+        name: user.name,
+        rollNo: user.rollNo,
+        studentCode: user.studentCode,
+      },
+    });
   }
 
-  res.status(404).json({
+  return res.status(404).json({
     message: "User Not Found",
   });
 });
+
 
 app.post("/api/students", verifyToken, isAdmin, async (req, res) => {
   try {

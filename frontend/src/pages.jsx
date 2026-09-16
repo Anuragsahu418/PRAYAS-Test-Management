@@ -136,6 +136,7 @@ export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState("student");
 
   const login = async () => {
     try {
@@ -423,104 +424,200 @@ export function Login() {
             WELCOME TO PRAYAS STUDENT PORTAL CLASS 10th
 
           </p>
+{/* ================= ROLE SWITCH ================= */}
 
-          {/* =====================================================
-              USERNAME
-             ===================================================== */}
+<div className="relative mt-7 mb-7 flex rounded-2xl border border-cyan-400/20 bg-slate-900/60 p-1">
+  <button
+    onClick={() => {
+      setRole("student");
+      setUsername("");
+      setPassword("");
+    }}
+    className={`flex-1 rounded-xl py-3 text-sm font-bold transition-all duration-300 ${
+      role === "student"
+        ? "bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-lg"
+        : "text-slate-400"
+    }`}
+  >
+    🎓 Student
+  </button>
 
-          <div className="relative mt-8 mb-5">
+  <button
+    onClick={() => {
+      setRole("admin");
+      setUsername("");
+      setPassword("");
+    }}
+    className={`flex-1 rounded-xl py-3 text-sm font-bold transition-all duration-300 ${
+      role === "admin"
+        ? "bg-gradient-to-r from-violet-600 to-pink-500 text-white shadow-lg"
+        : "text-slate-400"
+    }`}
+  >
+    🛡 Admin
+  </button>
+</div>
 
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-cyan-400/40 via-blue-400/20 to-violet-500/30 opacity-0 blur-sm transition-all duration-300 focus-within:opacity-100" />
+{/* ================= STACKED CARDS ================= */}
 
-            <div className="relative">
+<div className="relative mt-6 h-[360px]" style={{ perspective: "1500px" }}>
 
-              <User
-                size={20}
-                className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-cyan-300 drop-shadow-[0_0_7px_rgba(34,211,238,0.9)]"
-              />
+  {/* Visible rear cards */}
 
-              <input
-                type="text"
-                placeholder="Username / Student Code"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full rounded-2xl border border-cyan-300/20 bg-[#081524]/90 py-3.5 pl-12 pr-4 text-white placeholder:text-slate-500 outline-none transition-all duration-300 hover:border-cyan-300/40 focus:border-cyan-300/60 focus:bg-[#0a1929] focus:ring-2 focus:ring-cyan-400/[0.10] focus:shadow-[0_0_25px_rgba(34,211,238,0.18),inset_0_0_20px_rgba(34,211,238,0.04)]"
-              />
+  <div className="absolute inset-x-3 top-4 bottom-0 rounded-[1.8rem] border border-white/10 bg-white/[0.05] backdrop-blur-md" />
 
-            </div>
-          </div>
+  <div className="absolute inset-x-6 top-8 bottom-0 rounded-[1.8rem] border border-white/5 bg-white/[0.03]" />
 
-          {/* =====================================================
-              PASSWORD
-             ===================================================== */}
+  {/* Rotating front card */}
 
-          <div className="relative mb-6">
+  <div
+    className="absolute inset-0 transition-transform duration-700 ease-[cubic-bezier(.22,.61,.36,1)]"
+    style={{
+      transformStyle: "preserve-3d",
+      transform: role === "student" ? "rotateY(0deg)" : "rotateY(180deg)",
+    }}
+  >
+    {/* STUDENT */}
 
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-violet-400/30 to-fuchsia-500/30 opacity-0 blur-sm transition-all duration-300 focus-within:opacity-100" />
+    <div
+      className="absolute inset-0 rounded-[1.9rem] border border-cyan-400/20 bg-[#081524]/95 p-5 shadow-[0_0_35px_rgba(34,211,238,.20)]"
+      style={{ backfaceVisibility: "hidden" }}
+    >
+      <h3 className="mb-5 text-center text-xl font-black text-cyan-300">
+        🎓 Student Login
+      </h3>
 
-            <div className="relative">
+      <div className="relative mb-4">
+        <User
+          size={20}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-300"
+        />
 
-              <Lock
-                size={20}
-                className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-violet-300 drop-shadow-[0_0_7px_rgba(139,92,246,0.9)]"
-              />
+        <input
+          type="text"
+          placeholder="Student Code"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="w-full rounded-xl border border-cyan-400/20 bg-slate-900/70 py-3 pl-12 pr-4 text-white outline-none focus:border-cyan-400"
+        />
+      </div>
 
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-2xl border border-violet-300/20 bg-[#081524]/90 py-3.5 pl-12 pr-12 text-white placeholder:text-slate-500 outline-none transition-all duration-300 hover:border-violet-300/40 focus:border-violet-300/60 focus:bg-[#0a1929] focus:ring-2 focus:ring-violet-400/[0.10] focus:shadow-[0_0_25px_rgba(139,92,246,0.18),inset_0_0_20px_rgba(139,92,246,0.04)]"
-              />
+      <div className="relative mb-5">
+        <Lock
+          size={20}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-300"
+        />
 
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowPassword((prev) => !prev);
-                }}
-                className="absolute right-4 top-1/2 z-10 -translate-y-1/2 text-slate-400 transition-all duration-300 hover:text-cyan-300 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.9)]"
-              >
-                {showPassword ? (
-                  <EyeOff size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </button>
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full rounded-xl border border-violet-400/20 bg-slate-900/70 py-3 pl-12 pr-12 text-white outline-none focus:border-violet-400"
+        />
 
-            </div>
-          </div>
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-300"
+        >
+          {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+        </button>
+      </div>
 
-          {/* =====================================================
-              LOGIN BUTTON
-             ===================================================== */}
+      <button
+        onClick={login}
+        className="w-full rounded-xl bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-600 py-3 font-black text-white transition hover:scale-[1.02]"
+      >
+        Student Login
+      </button>
 
-          <button
-            onClick={login}
-            className="group relative w-full overflow-hidden rounded-2xl border border-cyan-300/40 bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-600 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-white shadow-[0_0_25px_rgba(34,211,238,0.35),0_0_55px_rgba(99,102,241,0.18)] transition-all duration-300 hover:scale-[1.015] hover:border-cyan-200/70 hover:shadow-[0_0_35px_rgba(34,211,238,0.55),0_0_70px_rgba(139,92,246,0.30)] active:scale-[0.99] sm:text-base"
-          >
+      <button
+        onClick={async () => {
+          try {
+            const res = await api.post("/login", {
+              username: "guest",
+              password: "guest123",
+            });
 
-            {/* Shine */}
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("role", "student");
+            localStorage.setItem("guest", "true");
+            localStorage.setItem("studentName", "Guest Explorer");
+            localStorage.setItem("rollNo", "GUEST");
+            localStorage.setItem("studentCode", "GUEST-001");
 
-            <div className="absolute inset-y-0 left-[-100%] w-1/2 skew-x-[-20deg] bg-white/25 blur-md transition-all duration-700 group-hover:left-[130%]" />
+            navigate("/student");
+          } catch {
+            alert("Guest login failed.");
+          }
+        }}
+        className="mt-3 w-full rounded-xl border border-emerald-400/30 bg-emerald-500/10 py-3 font-bold text-emerald-300 transition hover:bg-emerald-500/20"
+      >
+        ✨ Explore as Guest
+      </button>
+    </div>
 
-            {/* Hover glow */}
+    {/* ADMIN */}
 
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.25),transparent_65%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    <div
+      className="absolute inset-0 rounded-[1.9rem] border border-violet-400/20 bg-[#081524]/95 p-5 shadow-[0_0_35px_rgba(139,92,246,.20)]"
+      style={{
+        transform: "rotateY(180deg)",
+        backfaceVisibility: "hidden",
+      }}
+    >
+      <h3 className="mb-5 text-center text-xl font-black text-violet-300">
+        🛡 Admin Login
+      </h3>
 
-            <span className="relative flex items-center justify-center gap-3">
+      <div className="relative mb-4">
+        <User
+          size={20}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-300"
+        />
 
-              <span className="text-base drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]">
-                ⚡
-              </span>
+        <input
+          type="text"
+          placeholder="Admin Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="w-full rounded-xl border border-cyan-400/20 bg-slate-900/70 py-3 pl-12 pr-4 text-white outline-none focus:border-cyan-400"
+        />
+      </div>
 
-              <span>
-                Login
-              </span>
+      <div className="relative mb-5">
+        <Lock
+          size={20}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-300"
+        />
 
-            </span>
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full rounded-xl border border-violet-400/20 bg-slate-900/70 py-3 pl-12 pr-12 text-white outline-none focus:border-violet-400"
+        />
 
-          </button>
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-300"
+        >
+          {showPassword ? <EyeOff size={20}/> : <Eye size={20}/>}
+        </button>
+      </div>
+
+      <button
+        onClick={login}
+        className="w-full rounded-xl bg-gradient-to-r from-violet-600 via-pink-500 to-fuchsia-600 py-3 font-black text-white transition hover:scale-[1.02]"
+      >
+        Admin Login
+      </button>
+    </div>
+  </div>
+</div>
 
           {/* =====================================================
               BOTTOM DECORATION
@@ -898,7 +995,9 @@ function DashboardPage() {
 
       setData(res.data);
     } catch {
-      alert("Failed to load dashboard");
+      if (!isGuest) {
+    alert("Failed to load dashboard");
+  }
     }
   };
 
@@ -1149,6 +1248,16 @@ function DashboardPage() {
 
 export function StudentDashboard() {
   const [page, setPage] = useState("dashboard");
+  const isGuest = localStorage.getItem("guest") === "true";
+
+  useEffect(() => {
+  if (
+    isGuest &&
+    (page === "quizzes" || page === "tests")
+  ) {
+    setPage("dashboard");
+  }
+}, [page, isGuest]);
 
 return (
    <div className="min-h-screen bg-[#02030a] text-white flex flex-col lg:flex-row overflow-y-auto touch-pan-y">
@@ -1233,7 +1342,11 @@ return (
   <p className="text-sm uppercase tracking-wider text-emerald-200">
     Student Name
   </p>
-
+  {isGuest && (
+  <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-300 border border-emerald-400/30">
+    ✨ Guest Mode
+  </span>
+)}
   <p className="mt-1 text-lg sm:text-xl lg:text-2xl font-black text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] break-words leading-tight">
     {localStorage.getItem("studentName")}
   </p>
@@ -1271,8 +1384,13 @@ return (
 </div>
       {/* Navigation */}
       <ul className="space-y-3 flex-1">
-        {
-          ["dashboard", "quizzes", "results", "performance", "previous-papers"].map((item) => {
+        {[
+  "dashboard",
+  ...(!isGuest ? ["quizzes"] : []),
+  "results",
+  "performance",
+  "previous papers",
+].map((item) => {
             const icons = {
             dashboard: "🏠",
             quizzes: "🧠",
@@ -1332,7 +1450,7 @@ return (
         </div>
 
         {page === "dashboard" && <StudentHome />}
-        {page === "quizzes" && <StudentQuizHome />}
+        {page === "quizzes" && !isGuest && <StudentQuizzes />}
         {page === "results" && <StudentResults />}
         {page === "performance" && <StudentPerformance />}
         {page === "previous-papers" && <PreviousYearPapers />}
@@ -1370,7 +1488,9 @@ function StudentHome() {
       setResults(res.data);
 
     } catch (err) {
-      alert("Failed to load dashboard");
+     if (!isGuest) {
+    alert("Failed to load dashboard");
+  }
     } finally {
       setLoading(false);
     }
@@ -2277,7 +2397,9 @@ function StudentResults() {
 
 setResults(sortedResults);
     } catch (err) {
-      alert("Failed to load results");
+      if (!isGuest) {
+    alert("Failed to load dashboard");
+  }
     }
 
     const totalTests = results.length;
@@ -2477,7 +2599,9 @@ function StudentPerformance() {
       setResults(res.data);
 
     } catch (err) {
-      alert("Failed to load performance");
+      if (!isGuest) {
+    alert("Failed to load dashboard");
+  }
     }
   };
 
@@ -4554,7 +4678,9 @@ const loadStudents = async (testId = "") => {
     setStudents(res.data);
   } catch (err) {
     console.error(err);
-    alert("Failed to load students");
+    if (!isGuest) {
+    alert("Failed to load dashboard");
+  }
   }
 };
 const saveResults = async () => {
