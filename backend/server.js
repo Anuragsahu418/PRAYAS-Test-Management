@@ -19,7 +19,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 const isAdminOrTeacher = (req, res, next) => {
   if (req.user.role === "admin" || req.user.role === "teacher") {
     return next();
@@ -33,6 +32,21 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
   secure: true,
 });
+
+const isAuthenticatedUser = (req, res, next) => {
+  if (
+    req.user.role === "admin" ||
+    req.user.role === "teacher" ||
+    req.user.role === "student"
+  ) {
+    return next();
+  }
+
+  return res.status(403).json({
+    message: "Access denied",
+  });
+};
+
 
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -83,29 +97,31 @@ app.post("/api/papers", verifyToken, isAdmin, (req, res) => {
   });
 });
 
-app.get("/api/papers", async (req, res) => {
-  try {
-    const filter = {};
+app.get(
+  "/api/papers",
+  verifyToken,
+  isAuthenticatedUser,
+  async (req, res) => {
+    try {
+      const filter = {};
 
-    if (req.query.className)
-      filter.className = req.query.className;
+      if (req.query.className) filter.className = req.query.className;
+      if (req.query.subject) filter.subject = req.query.subject;
 
-    if (req.query.subject)
-      filter.subject = req.query.subject;
+      const papers = await PreviousPaper.find(filter).sort({
+        year: -1,   // Latest year first
+        subject: 1, // A-Z within the same year
+        title: 1,   // A-Z within the same subject
+      });
 
-    const papers = await PreviousPaper.find(filter).sort({
-  year: -1,     // Latest year first
-  subject: 1,   // A-Z within the same year
-  title: 1,     // A-Z within the same subject
-});
-
-    res.json(papers);
-  } catch (err) {
-    res.status(500).json({
-      message: err.message,
-    });
+      res.json(papers);
+    } catch (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+    }
   }
-});
+);
 
 // MongoDB Connection
 mongoose
@@ -129,8 +145,173 @@ app.get("/api/create-admins", async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
+
 app.post("/api/login", async (req, res) => {
-  const { username, password } = req.body;
+  const { usernameapp.post("/api/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // =========================
+    // Validate input
+    // =========================
+    if (!username || !password) {
+      return res.status(400).json({
+        message: "Username and password are required",
+      });
+    }
+
+    // =========================
+    // Guest Login
+    // =========================
+    if (
+      username.toLowerCase() === "guest" &&
+      password === "guest123"
+    ) {
+      const token = jwt.sign(
+        {
+          id: "guest",
+          role: "student",
+          guest: true,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      return res.json({
+        role: "student",
+        token,
+        guest: true,
+        student: {
+          id: "guest",
+          name: "Guest Explorer",
+          rollNo: "GUEST",
+          studentCode: "GUEST-001",
+        },
+      });
+    }
+
+    // =========================
+    // Check Admin / Teacher
+    // =========================
+    let user = await Admin.findOne({ username });
+
+    if (user) {
+      // Prevent bcrypt error if password is missing
+      if (!user.password) {
+        console.error("Admin/Teacher has no password:", user._id);
+
+        return res.status(500).json({
+          message: "Account password data is missing",
+        });
+      }
+
+      const match = await bcrypt.compare(password, user.password);
+
+      if (!match) {
+        return res.status(401).json({
+          message: "Invalid Password",
+        });
+      }
+
+      const role =
+        user.username === "Teacher"
+          ? "teacher"
+          : "admin";
+
+      const token = jwt.sign(
+        {
+          id: user._id,
+          role,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      return res.json({
+        role,
+        token,
+      });
+    }
+
+    // =========================
+    // Check Student
+    // =========================
+    user = await Student.findOne({
+      studentCode: username,
+    });
+
+    if (user) {
+      // Prevent bcrypt error if deleted/recreated
+      // student has missing password
+      if (!user.password) {
+        console.error(
+          "Student has no password:",
+          user._id,
+          user.studentCode
+        );
+
+        return res.status(500).json({
+          message: "Student account password data is missing",
+        });
+      }
+
+      const match = await bcrypt.compare(
+        password,
+        user.password
+      );
+
+      if (!match) {
+        return res.status(401).json({
+          message: "Invalid Password",
+        });
+      }
+
+      const token = jwt.sign(
+        {
+          id: user._id,
+          role: "student",
+          guest: false,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      return res.json({
+        role: "student",
+        token,
+        guest: false,
+        student: {
+          id: user._id,
+          name: user.name,
+          rollNo: user.rollNo,
+          studentCode: user.studentCode,
+        },
+      });
+    }
+
+    // =========================
+    // User Not Found
+    // =========================
+    return res.status(404).json({
+      message: "User Not Found",
+    });
+
+  } catch (error) {
+    // =========================
+    // Actual Backend Error
+    // =========================
+    console.error("LOGIN ERROR:", error);
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : undefined,
+    });
+  }
+});, password } = req.body;
 
   // =========================
   // Guest Login

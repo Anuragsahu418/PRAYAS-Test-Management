@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api, { SERVER_URL } from "./api";
 import { User, Lock, Eye, EyeOff, Users, FileText, TrendingUp, Trophy, BarChart4, LayoutDashboard, ClipboardList, LogOut,GraduationCap,Calendar,BookOpen} from "lucide-react";
+import {LineChart,Line,XAxis,YAxis,Tooltip,ResponsiveContainer,CartesianGrid,BarChart,Bar,} from "recharts";
 
 // ================= LOGIN =================
 
@@ -1392,11 +1393,11 @@ return (
   "previous papers",
 ].map((item) => {
             const icons = {
-            dashboard: "🏠",
-            quizzes: "🧠",
-            results: "📊",
-            performance: "📈",
-            "previous-papers": "📚",
+  dashboard: "🏠",
+  quizzes: "🧠",
+  results: "📊",
+  performance: "📈",
+  "previous-papers": "📚",
 };
 
             return (
@@ -1496,37 +1497,41 @@ function StudentHome() {
     }
   };
 
-  const validResults = results.filter(
+const validResults = results.filter(
   (r) => !isNaN(Number(r.marks))
 );
 
 const totalTests = results.length;
 
-const totalMarks = validResults.reduce(
+// Total marks obtained
+const totalObtained = validResults.reduce(
   (sum, r) => sum + Number(r.marks),
   0
 );
 
-const averageMarks =
-  validResults.length > 0
-    ? (totalMarks / validResults.length).toFixed(1)
-    : 0;
+// Total possible marks
+const totalPossible = validResults.reduce(
+  (sum, r) => sum + Number(r.testId?.totalMarks || 0),
+  0
+);
 
+// Weighted Average Percentage
 const averagePercentage =
-  validResults.length > 0
-    ? (
-        validResults.reduce((sum, r) => {
-          const marks = Number(r.marks || 0);
-          const total = Number(r.testId?.totalMarks || 0);
-          return sum + (total > 0 ? (marks / total) * 100 : 0);
-        }, 0) / validResults.length
-      ).toFixed(1)
-    : 0;
+  totalPossible > 0
+    ? ((totalObtained / totalPossible) * 100).toFixed(1)
+    : "0.0";
 
+// Highest Marks (kept for existing card)
 const highestMarks =
   validResults.length > 0
     ? Math.max(...validResults.map((r) => Number(r.marks)))
     : 0;
+
+// Average Marks (keep this if your return already uses it)
+const averageMarks =
+  validResults.length > 0
+    ? (totalObtained / validResults.length).toFixed(1)
+    : "0.0";
 
   const latestTests = [...results]
     .sort(
@@ -2635,6 +2640,55 @@ const presentTests = results.filter(
 
 const absentTests = results.length - presentTests;
 
+// ---------- Analytics Data ----------
+
+// Sort tests by date (oldest → newest)
+const sortedResults = [...results].sort((a, b) => {
+  const dateA = new Date(a.createdAt || a.testId?.createdAt || Date.now());
+  const dateB = new Date(b.createdAt || b.testId?.createdAt || Date.now());
+  return dateA - dateB;
+});
+
+// Only include attended tests in charts
+const chartData = sortedResults
+  .filter((r) => !isNaN(Number(r.marks)))
+  .map((r, i) => {
+    const marks = Number(r.marks);
+    const total = Number(r.testId?.totalMarks || 1);
+
+    return {
+      index: i + 1,
+      test: r.testId?.testName || `Test ${i + 1}`,
+      percentage: Number(((marks / total) * 100).toFixed(1)),
+      marks,
+      total,
+    };
+  });
+
+// Weighted Overall Performance
+const totalObtained = chartData.reduce((sum, t) => sum + t.marks, 0);
+const totalPossible = chartData.reduce((sum, t) => sum + t.total, 0);
+
+const overallPerformance =
+  totalPossible > 0
+    ? ((totalObtained / totalPossible) * 100).toFixed(1)
+    : "0.0";
+
+// Best Performance
+const bestPerformance =
+  chartData.length > 0
+    ? Math.max(...chartData.map((t) => t.percentage)).toFixed(1)
+    : "0.0";
+
+// Improvement (Latest − First)
+const overallImprovement =
+  chartData.length > 1
+    ? (
+        chartData[chartData.length - 1].percentage -
+        chartData[0].percentage
+      ).toFixed(1)
+    : "0.0";
+
   return (
     <>
 
@@ -2738,140 +2792,106 @@ const absentTests = results.length - presentTests;
 
       </div>
 
-      <div className="mt-6 sm:mt-10 overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(34,197,94,.15)]">
+<div className="mt-8 grid gap-6 lg:grid-cols-3">
 
-  <div className="bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 px-4 sm:px-6 py-3 sm:py-4">
-
-    <h2 className="text-base sm:text-lg lg:text-xl font-bold text-white break-words">
-      🏆 Performance History
+  <div className="rounded-3xl border border-cyan-400/15 bg-[#0B1220]/90 p-6 backdrop-blur-xl">
+    <p className="text-xs uppercase tracking-[3px] text-slate-400">
+      Average Score
+    </p>
+    <h2 className="mt-3 text-5xl font-black text-cyan-400">
+      {overallPerformance}%
     </h2>
-
   </div>
 
-  <div className="overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-[#0B1220]/90 backdrop-blur-2xl shadow-[0_0_35px_rgba(34,211,238,0.10)]">
-
-  <div className="w-full overflow-x-auto touch-auto">
-
-    <table className="min-w-[820px] w-full border-collapse text-sm text-slate-200">
-      
-      <thead>
-
-            <tr className="border-b border-white/10">
-
-              <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-slate-300 whitespace-nowrap text-xs sm:text-sm">
-                Test
-              </th>
-
-              <th className="px-3 sm:px-6 py-3 sm:py-4 text-center text-slate-300 whitespace-nowrap text-xs sm:text-sm">
-                Marks
-              </th>
-
-              <th className="px-3 sm:px-6 py-3 sm:py-4 text-center text-slate-300 whitespace-nowrap text-xs sm:text-sm">
-  Percentage
-</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {results.map((r, index) => {
-
-              const marks = isNaN(Number(r.marks)) ? 0 : Number(r.marks);
-const total = Number(r.testId?.totalMarks || 0);
-
-const percentage =
-  total > 0 ? ((marks / total) * 100).toFixed(1) : 0;
-
-let color = "text-red-400";
-
-if (percentage >= 90) {
-  color = "text-emerald-400";
-} else if (percentage >= 75) {
-  color = "text-cyan-400";
-} else if (percentage >= 60) {
-  color = "text-yellow-400";
-} else if (percentage >= 40) {
-  color = "text-orange-400";
-}
-
-              return (
-
-                <tr
-                  key={r._id}
-                  className={`border-b border-white/5 hover:bg-white/5 transition ${
-                    index % 2 === 0
-                      ? "bg-slate-900/30"
-                      : "bg-slate-800/20"
-                  }`}
-                >
-
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-cyan-300 font-semibold break-words min-w-[180px] leading-tight">
-
-                    {r.testId?.testName}
-
-                  </td>
-
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap">
-
-  {isNaN(Number(r.marks)) ? (
-
-    <span className="inline-flex items-center rounded-2xl border px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold shadow-lg backdrop-blur-xl whitespace-nowrap">
-      Absent
-    </span>
-
-  ) : (
-
-    <span
-      className={`inline-flex items-center rounded-2xl border px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur-xl ${
-        percentage >= 90
-          ? "border-emerald-400/30 bg-emerald-500/15 text-emerald-300"
-          : percentage >= 75
-          ? "border-cyan-400/30 bg-cyan-500/15 text-cyan-300"
-          : percentage >= 60
-          ? "border-amber-400/30 bg-amber-500/15 text-amber-300"
-          : percentage >= 40
-          ? "border-orange-400/30 bg-orange-500/15 text-orange-300"
-          : "border-rose-400/30 bg-rose-500/15 text-rose-300"
-      }`}
-    >
-      {marks}/{total}
-    </span>
-
-  )}
-
-</td>
-
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap">
-
-  <span
-    className={`rounded-xl px-4 py-2 font-bold shadow-lg ${
-      percentage >= 90
-        ? "bg-gradient-to-r from-emerald-500 to-green-600 text-white"
-        : percentage >= 75
-        ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white"
-        : percentage >= 60
-        ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
-        : "bg-gradient-to-r from-red-500 to-pink-600 text-white"
-    }`}
-  >
-    {percentage}%
-  </span>
-
-</td>
-
-                </tr>
-
-              );
-
-            })}
-
-                </tbody>
-    </table>
+  <div className="rounded-3xl border border-emerald-400/15 bg-[#0B1220]/90 p-6 backdrop-blur-xl">
+    <p className="text-xs uppercase tracking-[3px] text-slate-400">
+      Best Performance
+    </p>
+    <h2 className="mt-3 text-5xl font-black text-emerald-400">
+      {bestPerformance}%
+    </h2>
   </div>
+
+  <div className="rounded-3xl border border-violet-400/15 bg-[#0B1220]/90 p-6 backdrop-blur-xl">
+    <p className="text-xs uppercase tracking-[3px] text-slate-400">
+      Overall Improvement
+    </p>
+    <h2
+  className={`mt-3 text-5xl font-black ${
+    Number(overallImprovement) >= 0
+      ? "text-emerald-400"
+      : "text-red-400"
+  }`}
+>
+  {Number(overallImprovement) >= 0 ? "+" : ""}
+  {overallImprovement}%
+</h2>
   </div>
+
 </div>
+
+<div className="mt-8 grid gap-6 lg:grid-cols-2">
+
+  {/* Progress Line Chart */}
+
+  <div className="rounded-3xl border border-cyan-400/15 bg-[#0B1220]/90 p-6 backdrop-blur-xl">
+    <h3 className="mb-5 text-lg font-bold text-white">
+      📈 Progress Over Time
+    </h3>
+
+    <div className="h-72">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData}>
+          <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" />
+          <XAxis dataKey="index" stroke="#94a3b8" />
+          <YAxis stroke="#94a3b8" domain={[0, 100]} />
+          <Tooltip
+            contentStyle={{
+              background: "#0B1220",
+              border: "1px solid #334155",
+              borderRadius: "14px",
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="percentage"
+            stroke="#22d3ee"
+            strokeWidth={4}
+            dot={{ r: 5 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+
+  {/* Marks Bar Chart */}
+
+  <div className="rounded-3xl border border-violet-400/15 bg-[#0B1220]/90 p-6 backdrop-blur-xl">
+    <h3 className="mb-5 text-lg font-bold text-white">
+      📊 Test Performance
+    </h3>
+
+    <div className="h-72">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={chartData}>
+          <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" />
+          <XAxis dataKey="index" stroke="#94a3b8" />
+          <YAxis stroke="#94a3b8" domain={[0, 100]} />
+          <Tooltip
+            contentStyle={{
+              background: "#0B1220",
+              border: "1px solid #334155",
+              borderRadius: "14px",
+            }}
+          />
+          <Bar dataKey="percentage" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+
+</div>
+
 
 </>
   );
@@ -4933,14 +4953,23 @@ const uploadPaper = async () => {
     loadPapers();
   }, []);
 
-  const loadPapers = async () => {
-    try {
-      const res = await api.get("/papers");
-      setPapers(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+const loadPapers = async () => {
+  try {
+    const res = await api.get("/papers", {
+      headers: localStorage.getItem("token")
+        ? {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          }
+        : {},
+    });
+
+    console.log("Loaded Papers:", res.data);
+    setPapers(Array.isArray(res.data) ? res.data : []);
+  } catch (err) {
+    console.error("Load Papers Error:", err.response?.data || err);
+    setPapers([]);
+  }
+};
 
 return (
   <div className="mt-12">
