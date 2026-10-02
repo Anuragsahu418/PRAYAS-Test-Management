@@ -148,7 +148,6 @@ app.get("/api/create-admins", async (req, res) => {
 
 
 app.post("/api/login", async (req, res) => {
-  const { usernameapp.post("/api/login", async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -197,16 +196,21 @@ app.post("/api/login", async (req, res) => {
     let user = await Admin.findOne({ username });
 
     if (user) {
-      // Prevent bcrypt error if password is missing
       if (!user.password) {
-        console.error("Admin/Teacher has no password:", user._id);
+        console.error(
+          "Admin/Teacher password missing:",
+          user._id
+        );
 
         return res.status(500).json({
           message: "Account password data is missing",
         });
       }
 
-      const match = await bcrypt.compare(password, user.password);
+      const match = await bcrypt.compare(
+        password,
+        user.password
+      );
 
       if (!match) {
         return res.status(401).json({
@@ -222,15 +226,15 @@ app.post("/api/login", async (req, res) => {
       const token = jwt.sign(
         {
           id: user._id,
-          role,
+          role: role,
         },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
       );
 
       return res.json({
-        role,
-        token,
+        role: role,
+        token: token,
       });
     }
 
@@ -242,11 +246,9 @@ app.post("/api/login", async (req, res) => {
     });
 
     if (user) {
-      // Prevent bcrypt error if deleted/recreated
-      // student has missing password
       if (!user.password) {
         console.error(
-          "Student has no password:",
+          "Student password missing:",
           user._id,
           user.studentCode
         );
@@ -279,7 +281,7 @@ app.post("/api/login", async (req, res) => {
 
       return res.json({
         role: "student",
-        token,
+        token: token,
         guest: false,
         student: {
           id: user._id,
@@ -298,121 +300,13 @@ app.post("/api/login", async (req, res) => {
     });
 
   } catch (error) {
-    // =========================
-    // Actual Backend Error
-    // =========================
     console.error("LOGIN ERROR:", error);
 
     return res.status(500).json({
       message: "Internal Server Error",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : undefined,
     });
   }
-});, password } = req.body;
-
-  // =========================
-  // Guest Login
-  // =========================
-  if (
-    username.toLowerCase() === "guest" &&
-    password === "guest123"
-  ) {
-    const token = jwt.sign(
-      {
-        id: "guest",
-        role: "student",
-        guest: true,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    return res.json({
-      role: "student",
-      token,
-      guest: true,
-      student: {
-        id: "guest",
-        name: "Guest Explorer",
-        rollNo: "GUEST",
-        studentCode: "GUEST-001",
-      },
-    });
-  }
-
-  // =========================
-  // Check Admin / Teacher
-  // =========================
-  let user = await Admin.findOne({ username });
-
-  if (user) {
-    const match = await bcrypt.compare(password, user.password);
-
-    if (!match) {
-      return res.status(401).json({
-        message: "Invalid Password",
-      });
-    }
-
-    const role = user.username === "Teacher" ? "teacher" : "admin";
-
-    const token = jwt.sign(
-      { id: user._id, role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    return res.json({
-      role,
-      token,
-    });
-  }
-
-  // =========================
-  // Check Student
-  // =========================
-  user = await Student.findOne({ studentCode: username });
-
-  if (user) {
-    const match = await bcrypt.compare(password, user.password);
-
-    if (!match) {
-      return res.status(401).json({
-        message: "Invalid Password",
-      });
-    }
-
-    const token = jwt.sign(
-      {
-        id: user._id,
-        role: "student",
-        guest: false,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    return res.json({
-      role: "student",
-      token,
-      guest: false,
-      student: {
-        id: user._id,
-        name: user.name,
-        rollNo: user.rollNo,
-        studentCode: user.studentCode,
-      },
-    });
-  }
-
-  return res.status(404).json({
-    message: "User Not Found",
-  });
 });
-
 
 app.post("/api/students", verifyToken, isAdmin, async (req, res) => {
   try {
