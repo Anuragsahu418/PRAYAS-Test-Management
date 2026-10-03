@@ -124,13 +124,29 @@ app.get(
 );
 
 // MongoDB Connection
+// MongoDB Connection
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(async () => {
     console.log("✅ MongoDB Connected");
     await createAdmin();
   })
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err);
+  });
+
+mongoose.connection.on("connected", () => {
+  console.log("🟢 Mongoose connection established");
+});
+
+mongoose.connection.on("error", (err) => {
+  console.error("🔴 Mongoose connection error:", err);
+});
+
+mongoose.connection.on("disconnected", () => {
+  console.log("🟠 Mongoose disconnected");
+});
 
 // Test Route
 app.get("/api", (req, res) => {
