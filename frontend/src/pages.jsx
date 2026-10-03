@@ -1390,7 +1390,7 @@ return (
   ...(!isGuest ? ["quizzes"] : []),
   "results",
   "performance",
-  "previous papers",
+  "previous-papers",
 ].map((item) => {
             const icons = {
   dashboard: "🏠",
@@ -1399,6 +1399,7 @@ return (
   performance: "📈",
   "previous-papers": "📚",
 };
+
 
             return (
               <li
@@ -1451,7 +1452,7 @@ return (
         </div>
 
         {page === "dashboard" && <StudentHome />}
-        {page === "quizzes" && !isGuest && <StudentQuizzes />}
+        {page === "quizzes" && !isGuest && <StudentQuizHome />}
         {page === "results" && <StudentResults />}
         {page === "performance" && <StudentPerformance />}
         {page === "previous-papers" && <PreviousYearPapers />}
